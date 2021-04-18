@@ -1,6 +1,11 @@
 import tweepy
 from accounts import accounts
 
+COORD = {
+  'lat': [-43.00311, -12.46113],
+  'lon': [113.6594, 153.61194],
+}
+
 token = accounts[0]
 
 # Authenticate to Twitter
