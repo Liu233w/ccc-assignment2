@@ -1,11 +1,26 @@
 ---
-# Create an instance on NeCTAR
-- name: Create an instance
+
+- name: Create instance for head node of CouchDB
+  os_server:
+    name: '{{ db.head.name }}'
+    image: '{{ instance_image }}'
+    key_name: '{{ instance_key_name }}'
+    flavor: '{{ db.head.flavor }}'
+    availability_zone: '{{ availability_zone }}'
+    security_groups: '{{ db.head.security_groups }}'
+    # network: '{{ instance_network }}'
+    auto_floating_ip: yes
+    wait: yes
+    timeout: '600'
+    state: present
+  register: db_head_instance
+
+- name: Create instances for worker nodes of CouchDB
   os_server:
     name: '{{ item.name }}'
     image: '{{ instance_image }}'
     key_name: '{{ instance_key_name }}'
-    flavor: '{{ instance_flavor }}'
+    flavor: '{{ item.flavor }}'
     availability_zone: '{{ availability_zone }}'
     security_groups: '{{ item.security_groups }}'
     # network: '{{ instance_network }}'
@@ -13,27 +28,50 @@
     wait: yes
     timeout: '600'
     state: present
-  loop: '{{ instances }}'
-  register: os_instance
+  loop: '{{ db.workers }}'
+  register: db_worker_instances
 
-- name: Show ip addresses
+- name: Add db head to hosts
+  add_host:
+    name: '{{ db_head_instance.openstack.public_v4 }}'
+    groups: db_head
+    instance_name: '{{ db_head_instance.openstack.name }}'
+    ip: '{{ db_head_instance.openstack.public_v4 }}'
+  when: db_head_instance.openstack is defined
+
+- name: Add db workers to hosts
+  add_host:
+    name: '{{ db_head_instance.openstack.public_v4 }}'
+    groups: db_workers
+    instance_name: '{{ item.openstack.name }}'
+    ip: '{{ db_head_instance.openstack.public_v4 }}'
+  loop: '{{ db_worker_instances.results }}'
+  when: item.openstack is defined
+
+- name: Show all instances
   debug:
-    msg: "Instance {{ item.openstack.name }} has been created. IP address is {{ item.openstack.public_v4 }}"
-  loop: '{{ os_instance.results }}'
-  when: item.openstack is defined
+    var: '{{ hostvars }}'
 
-- name: Wait for connection
-  wait_for:
-    host: "{{ item.openstack.public_v4 }}"
-    port: 22
-    timeout: 120
-    search_regex: OpenSSH
-  loop: '{{ os_instance.results }}'
-  when: item.openstack is defined
+# - name: Show ip addresses for db head
+#   debug:
+#     msg: "Instance {{ hostvars[groups.db_head[0]].instance_name }} has been created. IP address is {{ hostvars[groups.db_head[0]].name }}"
 
-# - name: Show instance information
-#   host: "{{ item.openstack.public_v4 }}"
-#   raw: uname -a
-#   timeout: 120
-#   loop: '{{ os_instance.results }}'
-#   when: item.openstack is defined
+# - name: Show ip addresses for db workers
+#   debug:
+#     msg: "Instance {{ hostvars[item].instance_name }} has been created. IP address is {{ hostvars[item].name }}"
+#   loop: '{{ groups.db_workers }}'
+
+# - name: Wait for connection
+#   wait_for:
+#     host: "{{ item.openstack.public_v4 }}"
+#     port: 22
+#     timeout: 120
+#     search_regex: OpenSSH
+#   with_items:
+#   - '{{ hostvars[group.db_head[0]] }}'
+
+- name: Show instances information
+  delegate_to: "{{ item.ip }}"
+  raw: uname -a
+  timeout: 120
+  loop: '{{ hostvars }}'

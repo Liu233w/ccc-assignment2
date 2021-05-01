@@ -25,19 +25,22 @@ webservice_instance:
   flavor: uom.general.2c8g
   key_name: id-eresearch
 
-instances:
-  - name: db-1
+db:
+  head:
+    name: db-1
     security_groups: ['ssh']
+    flavor: uom.mse.2c9g
+  workers:
   - name: db-2
     security_groups: ['ssh']
+    flavor: uom.mse.2c9g
   - name: db-3
     security_groups: ['ssh']
+    flavor: uom.mse.2c9g
 
 instance_image: '9a689870-7c2b-4c74-a9a8-44f9ff587b43' # CentOS 8 x86_64
 instance_key_name: 'My key' # Specify your key name here, there should also be a private 
                             #   key file located in ~/.ssh/{instance_key_name}.pem
-instance_flavor: uom.mse.2c9g
-# instance_network: 
 
 # Volume
 volumes:
