@@ -26,6 +26,6 @@
 
 - name: Start docker
   systemd:
-    name: dockerd
+    name: docker
     state: started
   become: yes

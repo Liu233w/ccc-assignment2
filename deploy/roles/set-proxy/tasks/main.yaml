@@ -1,0 +1,19 @@
+---
+
+- name: Ensure http proxy
+  lineinfile:
+    path: /etc/environment
+    regexp: '{{ item.reg }}'
+    line: '{{ item.text }}'
+  become: yes
+  loop:
+    - reg: '^HTTP_PROXY='
+      text: HTTP_PROXY=http://wwwproxy.unimelb.edu.au:8000/
+    - reg: '^HTTPS_PROXY='
+      text: HTTPS_PROXY=http://wwwproxy.unimelb.edu.au:8000/
+    - reg: '^http_proxy='
+      text: http_proxy=http://wwwproxy.unimelb.edu.au:8000/
+    - reg: '^https_proxy='
+      text: https_proxy=http://wwwproxy.unimelb.edu.au:8000/
+    - reg: '^no_proxy='
+      text: no_proxy=localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au
