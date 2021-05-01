@@ -6,7 +6,7 @@
   roles:
   - role: common
   # - role: list-images # only used to test of openstack works
-  - role: volume
   - role: security-group
   - role: instances
+  - role: volume
   # - role: volume-snapshot # Seems like that snapshot is not available
