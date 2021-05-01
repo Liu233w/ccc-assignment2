@@ -30,3 +30,4 @@
   roles:
   - setup-db-volumn
   - setup-couchdb
+  - setup-couchdb-head

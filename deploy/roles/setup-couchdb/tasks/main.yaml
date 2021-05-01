@@ -3,6 +3,8 @@
 - name: Set an alias of host ip
   set_fact:
     host_ip: '{{hostvars[inventory_hostname].ansible_default_ipv4.address}}'
+    head_node_ip: '{{groups.db_head[0]}}'
+    node_count: "{{groups['db_workers'] | length + 1}}"
 
 - name: 'Setup CouchDB environment variable'
   lineinfile:
@@ -49,3 +51,38 @@
     state: started
     daemon_reload: true
     enabled: true
+
+- name: Setup cluster for CouchDB worker nodes
+  uri:
+    url: http://{{couchdb.user}}:{{couchdb.pwd}}@{{head_node_ip}}:5984/_cluster_setup
+    method: POST
+    body_format: json
+    headers:
+      Content-Type: application/json
+    body:
+      action: enable_cluster
+      bind_address: '0.0.0.0'
+      username: '{{couchdb.user}}'
+      password: '{{couchdb.pwd}}'
+      port: '5984'
+      remote_node: '{{host_ip}}'
+      node_count: '{{node_count}}'
+      remote_current_user: '{{couchdb.user}}'
+      remote_current_password: '{{couchdb.pwd}}'
+  when: inventory_hostname in groups['db_workers']
+
+- name: Initialize CouchDB worker nodes
+  uri:
+    url: http://{{couchdb.user}}:{{couchdb.pwd}}@{{head_node_ip}}:5984/_cluster_setup
+    method: POST
+    body_format: json
+    headers:
+      Content-Type: application/json
+    body:
+      action: add_node
+      host: '{{host_ip}}'
+      username: '{{couchdb.user}}'
+      password: '{{couchdb.pwd}}'
+      port: '5984'
+  when: inventory_hostname in groups['db_workers']
+      

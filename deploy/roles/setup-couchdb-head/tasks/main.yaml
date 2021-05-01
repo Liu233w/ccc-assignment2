@@ -1,0 +1,25 @@
+---
+
+- name: This empty request is to avoid an error message when finishing the cluster setup
+  uri:
+    url: http://{{couchdb.user}}:{{couchdb.pwd}}@{{inventory_hostname}}:5984/
+    method: GET
+  when: inventory_hostname in groups['db_head']
+
+- name: Finish cluster setup
+  uri:
+    url: http://{{couchdb.user}}:{{couchdb.pwd}}@{{inventory_hostname}}:5984/_cluster_setup
+    method: POST
+    body_format: json
+    headers:
+      Content-Type: application/json
+    body:
+      action: finish_cluster
+  when: inventory_hostname in groups['db_head']
+
+- name: Add twitter database
+  uri:
+    url: http://{{couchdb.user}}:{{couchdb.pwd}}@{{inventory_hostname}}:5984/twitter
+    method: PUT
+  when: inventory_hostname in groups['db_head']
+
