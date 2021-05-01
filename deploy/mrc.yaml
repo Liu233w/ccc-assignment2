@@ -9,4 +9,4 @@
   - role: volume
   - role: security-group
   - role: instances
-  - role: volume-snapshot
+  # - role: volume-snapshot # Seems like that snapshot is not available
