@@ -1,0 +1,12 @@
+- hosts: localhost
+  vars_files:
+    - host_vars/openstack.yaml
+  gather_facts: true
+
+  roles:
+  - openstack-common
+  # - openstack-list-images # only used to test of openstack works
+  - openstack-security-group
+  - openstack-instances
+  - openstack-volume
+  # - openstack-volume-snapshot # Seems like that snapshot is not available

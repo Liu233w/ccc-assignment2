@@ -6,7 +6,7 @@
   - webservice
 
   vars_files:
-  - host_vars/application.yaml
+  - host_vars/app.yaml
 
   gather_facts: true
 
