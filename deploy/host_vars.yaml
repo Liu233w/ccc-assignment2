@@ -1,0 +1,54 @@
+# Common vars
+availability_zone: melbourne-qh2-uom
+
+# Security group
+security_groups:
+  - name: ssh
+    description: "Security group for SSH access"
+    protocol: tcp
+    port_range_min: 22
+    port_range_max: 22
+    remote_ip_prefix: 0.0.0.0/0
+  - name: http
+    description: "Security group for HTTP"
+    protocol: tcp
+    port_range_min: 80
+    port_range_max: 80
+    remote_ip_prefix: 0.0.0.0/0
+
+couchdb_instance:
+  image: '9a689870-7c2b-4c74-a9a8-44f9ff587b43' # CentOS 8 x86_64
+  flavor: uom.general.2c8g
+  key_name: id-eresearch
+
+webservice_instance:
+  flavor: uom.general.2c8g
+  key_name: id-eresearch
+
+instances:
+  - name: db-1
+    security_groups: ['ssh']
+  - name: db-2
+    security_groups: ['ssh']
+  - name: db-3
+    security_groups: ['ssh']
+
+instance_image: '9a689870-7c2b-4c74-a9a8-44f9ff587b43' # CentOS 8 x86_64
+instance_key_name: 'My key' # Specify your key name here, there should also be a private 
+                            #   key file located in ~/.ssh/{instance_key_name}.pem
+instance_flavor: uom.mse.2c9g
+# instance_network: 
+
+# Volume
+volumes:
+- vol_name: db-vol-1
+  vol_size: 150
+  instance: db-1
+- vol_name: db-vol-2
+  vol_size: 150
+  instance: db-2
+- vol_name: db-vol-3
+  vol_size: 150
+  instance: db-3
+# - vol_name: service-vol-3
+#   vol_size: 10
