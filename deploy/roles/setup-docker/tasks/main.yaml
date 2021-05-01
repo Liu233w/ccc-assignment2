@@ -4,16 +4,14 @@
   yum:
     name: ['yum-utils']
     state: present
-  become: yes
 
 - name: Add docker repository
   shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
   register: repo_setup_return
-  become: yes
 
-- name: Print repo setup log
-  debug:
-    var: repo_setup_return
+# - name: Print repo setup log
+#   debug:
+#     var: repo_setup_return
 
 - name: Install docker
   yum:
@@ -22,10 +20,8 @@
     - docker-ce-cli
     - containerd.io
     state: present
-  become: yes
 
 - name: Start docker
   systemd:
     name: docker
     state: started
-  become: yes

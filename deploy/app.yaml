@@ -3,15 +3,30 @@
 - hosts:
   - db_head
   - db_workers
-  - webservice
+  - webservices
 
   vars_files:
   - host_vars/app.yaml
 
   gather_facts: true
-
   remote_user: ec2-user
+  become: true
 
   roles:
   - set-proxy
   - setup-docker
+
+- hosts:
+  - db_head
+  - db_workers
+
+  vars_files:
+  - host_vars/app.yaml
+
+  gather_facts: true
+  remote_user: ec2-user
+  become: true
+
+  roles:
+  - setup-db-volumn
+  - setup-couchdb

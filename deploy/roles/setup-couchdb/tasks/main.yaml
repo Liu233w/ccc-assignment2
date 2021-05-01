@@ -1,0 +1,41 @@
+---
+
+- name: 'Setup CouchDB environment variable'
+  lineinfile:
+    path: /etc/environment
+    regexp: '{{ item.reg }}'
+    line: '{{ item.text }}'
+  loop:
+  - reg: '^COUCH_DB_USER='
+    text: 'COUCH_DB_USER={{couchdb.user}}'
+  - reg: '^COUCH_DB_PASS='
+    text: 'COUCH_DB_PASS={{couchdb.pwd}}'
+  - reg: '^COUCH_DB_SECRET='
+    text: 'COUCH_DB_SECRET={{couchdb.secret}}'
+  - reg: '^COUCH_DB_VERSION='
+    text: 'COUCH_DB_VERSION={{couchdb.version}}'
+  - reg: '^HOST_IP='
+    text: 'HOST_IP={{hostvars[inventory_hostname].ansible_default_ipv4.address}}'
+
+- name: Creates directory 'couchdb'
+  file:
+    path: /var/www/couchdb
+    state: directory
+    recurse: true
+
+- name: 'Setup CouchDB script'
+  copy:
+    src: run.sh
+    dest: /var/www/couchdb/run.sh
+    mode: u=rwx,g=rx,o=rx
+  
+- name: 'Setup systemd file'
+  copy:
+    src: couchdb.service
+    dest: /etc/systemd/system/couchdb.service
+    mode: u=rw,g=r,o=r
+
+- name: Start couchdb
+  systemd:
+    name: couchdb
+    state: started

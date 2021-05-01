@@ -5,7 +5,6 @@
     path: /etc/environment
     regexp: '{{ item.reg }}'
     line: '{{ item.text }}'
-  become: yes
   loop:
     - reg: '^HTTP_PROXY='
       text: HTTP_PROXY=http://wwwproxy.unimelb.edu.au:8000/

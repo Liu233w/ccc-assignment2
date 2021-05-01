@@ -1,0 +1,16 @@
+[Unit]
+Description=Couch db docker
+After=syslog.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash run.sh
+WorkingDirectory=/var/www/couchdb
+Restart=on-failure
+RestartSec=5s
+KillSignal=SIGINT
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
