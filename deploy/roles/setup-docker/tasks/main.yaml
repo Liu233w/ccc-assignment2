@@ -21,7 +21,19 @@
     - containerd.io
     state: present
 
+- name: Creates directory for docker config
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    recurse: true
+
+- name: 'Setup docker config file'
+  copy:
+    src: http-proxy.conf
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+
 - name: Start docker
   systemd:
     name: docker
     state: started
+    enabled: true
