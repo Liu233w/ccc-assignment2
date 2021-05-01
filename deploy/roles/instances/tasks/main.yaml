@@ -9,7 +9,7 @@
     availability_zone: '{{ availability_zone }}'
     security_groups: '{{ item.security_groups }}'
     # network: '{{ instance_network }}'
-    auto_floating_ip: yes
+    # auto_floating_ip: yes
     wait: yes
     timeout: '600'
     state: present

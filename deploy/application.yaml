@@ -1,0 +1,16 @@
+---
+
+- hosts:
+  - db_head
+  - db_workers
+  - webservice
+
+  vars_files:
+  - host_vars/application.yaml
+
+  gather_facts: true
+
+  remote_user: ec2-user
+
+  roles:
+  - setup-docker

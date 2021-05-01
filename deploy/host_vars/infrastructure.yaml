@@ -15,6 +15,12 @@ security_groups:
     port_range_min: 80
     port_range_max: 80
     remote_ip_prefix: 0.0.0.0/0
+  - name: couchdb
+    description: "Security group for CouchDB Cluster"
+    protocol: tcp
+    port_range_min: 5984
+    port_range_max: 5984
+    remote_ip_prefix: 0.0.0.0/0
 
 couchdb_instance:
   image: '9a689870-7c2b-4c74-a9a8-44f9ff587b43' # CentOS 8 x86_64
@@ -27,19 +33,26 @@ webservice_instance:
 
 instances:
   - name: db-1
-    security_groups: ['ssh']
+    security_groups: 
+    - default
+    - ssh
+    - couchdb
     flavor: uom.mse.2c9g
   - name: db-2
-    security_groups: ['ssh']
+    security_groups:
+    - default
+    - ssh
+    - couchdb
     flavor: uom.mse.2c9g
   - name: db-3
-    security_groups: ['ssh']
+    security_groups:
+    - default
+    - ssh
+    - couchdb
     flavor: uom.mse.2c9g
 
 instance_image: '9a689870-7c2b-4c74-a9a8-44f9ff587b43' # CentOS 8 x86_64
-instance_key_name: 'My key' # Specify your key name here, there should also be a private 
-                            #   key file located in ~/.ssh/{instance_key_name}.pem
-# instance_network: 
+instance_key_name: 'My key' # Specify your key name here
 
 # Volume
 volumes:
