@@ -5,7 +5,7 @@
     name: '{{ item.name }}'
     image: '{{ instance_image }}'
     key_name: '{{ instance_key_name }}'
-    flavor: '{{ instance_flavor }}'
+    flavor: '{{ item.flavor }}'
     availability_zone: '{{ availability_zone }}'
     security_groups: '{{ item.security_groups }}'
     # network: '{{ instance_network }}'
@@ -30,10 +30,3 @@
     search_regex: OpenSSH
   loop: '{{ os_instance.results }}'
   when: item.openstack is defined
-
-# - name: Show instance information
-#   host: "{{ item.openstack.public_v4 }}"
-#   raw: uname -a
-#   timeout: 120
-#   loop: '{{ os_instance.results }}'
-#   when: item.openstack is defined
