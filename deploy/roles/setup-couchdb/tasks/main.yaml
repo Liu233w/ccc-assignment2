@@ -1,5 +1,9 @@
 ---
 
+- name: Set an alias of host ip
+  set_fact:
+    host_ip: '{{hostvars[inventory_hostname].ansible_default_ipv4.address}}'
+
 - name: 'Setup CouchDB environment variable'
   lineinfile:
     path: /etc/environment
@@ -17,18 +21,22 @@
   - reg: '^HOST_IP='
     text: 'HOST_IP={{hostvars[inventory_hostname].ansible_default_ipv4.address}}'
 
-- name: Creates directory 'couchdb'
-  file:
-    path: /var/www/couchdb
-    state: directory
-    recurse: true
+- name: Create CouchDB container
+  docker_container:
+    name: couchdb
+    image: ibmcom/couchdb3:{{couchdb.version}}
+    state: present
+    recreate: yes
+    env:
+      COUCHDB_USER: '{{couchdb.user}}'
+      COUCHDB_PASSWORD: '{{couchdb.pwd}}'
+      COUCHDB_SECRET: '{{couchdb.secret}}'
+      ERL_FLAGS: '-setcookie {{couchdb.secret}} -name couchdb@{{host_ip}}'
+    exposed_ports:
+    - '5984'
+    volumes:
+    - /home/couchdb/data:/mnt/data/couchdb
 
-- name: 'Setup CouchDB script'
-  copy:
-    src: run.sh
-    dest: /var/www/couchdb/run.sh
-    mode: u=rwx,g=rx,o=rx
-  
 - name: 'Setup systemd file'
   copy:
     src: couchdb.service
@@ -39,3 +47,5 @@
   systemd:
     name: couchdb
     state: started
+    daemon_reload: true
+    enabled: true

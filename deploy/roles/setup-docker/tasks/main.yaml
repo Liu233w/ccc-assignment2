@@ -37,3 +37,8 @@
     name: docker
     state: started
     enabled: true
+
+- name: Ensure docker sdk installed
+  pip:
+    name: ['docker-py>=1.10.0']
+    state: present

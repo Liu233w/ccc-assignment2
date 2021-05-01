@@ -4,8 +4,7 @@ After=syslog.target
 
 [Service]
 Type=simple
-ExecStart=/bin/bash run.sh
-WorkingDirectory=/var/www/couchdb
+ExecStart=/bin/bash -c "docker start --attach couchdb"
 Restart=on-failure
 RestartSec=5s
 KillSignal=SIGINT

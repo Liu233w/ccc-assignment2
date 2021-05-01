@@ -13,7 +13,7 @@
   become: true
 
   roles:
-  - set-proxy
+  - common
   - setup-docker
 
 - hosts:
