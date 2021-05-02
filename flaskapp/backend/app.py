@@ -10,12 +10,12 @@ from pathlib import Path
 def _main():
     # application_path: ~/backend/
     application_path = Path(path.abspath(__file__)).parent
-    template_folder = str(Path(application_path, "dist"))
+    dist_folder = str(Path(application_path, "dist"))
 
     serve_port = 9797
 
     # creates the Flask application instance
-    app = Flask(__name__, static_folder=template_folder, template_folder=template_folder)
+    app = Flask(__name__, static_folder=dist_folder, template_folder=dist_folder)
 
     app.register_blueprint(service_bp)
     app.config.update({'DEBUG': True})

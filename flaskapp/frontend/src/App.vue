@@ -5,12 +5,14 @@
       <router-link to="/about">About</router-link>
       <h1>Connected: {{getConnectionStatus}}</h1>
     </div>
-    <router-view/>
+    <keep-alive>
+      <router-view class="pa-0"/>
+    </keep-alive>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters} from 'vuex'
 
 export default {
   name: 'App',
@@ -27,14 +29,15 @@ export default {
   },
 
   methods: {
-    // ...mapMutations('msgParserSocketStore', ['setSocketConnectedFlag']),
     ...mapActions('msgParserSocketStore', ['connectSockets']),
   },
 
   created() {
+    console.log("app page is created")
     this.connectSockets()
   },
-  mounted () {
+
+  activated(){
 
   }
 };

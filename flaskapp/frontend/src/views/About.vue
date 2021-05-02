@@ -4,3 +4,26 @@
     <h1>Just a test</h1>
   </div>
 </template>
+
+<script>
+
+export default {
+  name: 'About',
+
+  components: {
+  },
+
+  data: () => ({
+  }),
+
+  computed: {
+  },
+
+  methods: {
+  },
+
+  activated(){
+    console.log("about page is activated")
+  }
+}
+</script>
