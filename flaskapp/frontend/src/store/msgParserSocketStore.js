@@ -31,9 +31,9 @@ const actions = {
             console.log("connected")
             commit('setSocketConnectedFlag', true)
         })
-        // state.serpentSocket.on('disconnect', () => {
-        //     commit('setSocketConnectedFlag', false)
-        // })
+        state.msgParserSocket.on('disconnect', () => {
+            commit('setSocketConnectedFlag', false)
+        })
     }
 }
 

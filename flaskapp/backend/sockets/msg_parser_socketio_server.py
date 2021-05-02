@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from flask import jsonify, make_response
 from flaskapp.backend.sockets.socketio_server import SocketIOServer
 from flaskapp.backend.models.constants import EventKey
 
@@ -14,6 +13,7 @@ class MsgParserSocketIOServer(SocketIOServer):
 
         self.on_event("connect", self._connect)
         self.on_event("getProjectInfo", self._get_project_info)
+        self.on_event("eventEmitExample", self._event_emit_example)
 
     def _connect(self):
         print(f"established connection with front end")
@@ -32,3 +32,12 @@ class MsgParserSocketIOServer(SocketIOServer):
             data = json.load(f)
         # return response to frontend
         return json.dumps(data)
+
+    def _event_emit_example(self, payload):
+        """
+        Emit event to frontend
+        :return:
+        """
+        print(f"event emit example payload from front end: {payload}")
+        self.emit_event(topic="eventEmitExample", payload=payload)
+        return

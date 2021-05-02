@@ -39,10 +39,14 @@ const mutations = {
 };
 
 const actions = {
-    // subscribeSocket: ({getters}) => {
-    //     getters.getSocket.on('service_event', () => {
-    //     })
-    // },
+    subscribeSocket: ({getters}) => {
+        getters.getSocket.on('serviceEvent', (payload) => {
+            if (payload.topic === "eventEmitExample"){
+                // this matches with self.emit_event(topic="eventEmitExample", payload=payload) from backend
+                console.log(`topic = "eventEmitExample", received payload = ${payload.payload}`)
+            }
+        })
+    },
     getProjectInfo: ({getters, commit}) => {
         getters.getSocket.emit('getProjectInfo', (resp) => {
             const respObj = JSON.parse(resp)
@@ -51,6 +55,11 @@ const actions = {
             commit("setMembers", respObj.members)
             commit("setDescription", respObj.description)
         })
+    },
+    testBackendEventEmitExample: ({getters}) => {
+        const payload = "Communication message."
+        // if no result is returned via response, then there is no need to wait for response
+        getters.getSocket.emit('eventEmitExample', payload)
     }
 };
 

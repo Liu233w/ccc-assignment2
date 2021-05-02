@@ -23,7 +23,6 @@ export default {
   },
 
   activated(){
-    console.log("about page is activated")
   }
 }
 </script>

@@ -27,11 +27,16 @@ export default {
   },
 
   methods: {
-    ...mapActions('homePanelStore', ['getProjectInfo']),
+    ...mapActions('homePanelStore', ['getProjectInfo', 'subscribeSocket', 'testBackendEventEmitExample']),
+  },
+
+  created(){
+    this.subscribeSocket()
+    this.getProjectInfo()
   },
 
   activated(){
-    this.getProjectInfo()
+    this.testBackendEventEmitExample()
   }
 }
 </script>
