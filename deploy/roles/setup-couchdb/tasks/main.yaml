@@ -36,7 +36,9 @@
 
 - name: Setup cluster for CouchDB worker nodes
   uri:
-    url: http://{{couchdb.user}}:{{couchdb.pwd}}@{{head_node_ip}}:5984/_cluster_setup
+    url: http://{{head_node_ip}}:5984/_cluster_setup
+    url_username: '{{couchdb.user}}'
+    url_password: '{{couchdb.pwd}}'
     method: POST
     body_format: json
     headers:
@@ -55,7 +57,9 @@
 
 - name: Initialize CouchDB worker nodes
   uri:
-    url: http://{{couchdb.user}}:{{couchdb.pwd}}@{{head_node_ip}}:5984/_cluster_setup
+    url: http://{{head_node_ip}}:5984/_cluster_setup
+    url_username: '{{couchdb.user}}'
+    url_password: '{{couchdb.pwd}}'
     method: POST
     body_format: json
     headers:
