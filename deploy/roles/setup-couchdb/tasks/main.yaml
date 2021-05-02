@@ -6,23 +6,6 @@
     head_node_ip: '{{groups.db_head[0]}}'
     node_count: "{{groups['db_workers'] | length + 1}}"
 
-- name: 'Setup CouchDB environment variable'
-  lineinfile:
-    path: /etc/environment
-    regexp: '{{ item.reg }}'
-    line: '{{ item.text }}'
-  loop:
-  - reg: '^COUCH_DB_USER='
-    text: 'COUCH_DB_USER={{couchdb.user}}'
-  - reg: '^COUCH_DB_PASS='
-    text: 'COUCH_DB_PASS={{couchdb.pwd}}'
-  - reg: '^COUCH_DB_SECRET='
-    text: 'COUCH_DB_SECRET={{couchdb.secret}}'
-  - reg: '^COUCH_DB_VERSION='
-    text: 'COUCH_DB_VERSION={{couchdb.version}}'
-  - reg: '^HOST_IP='
-    text: 'HOST_IP={{hostvars[inventory_hostname].ansible_default_ipv4.address}}'
-
 - name: Create CouchDB container
   docker_container:
     name: couchdb
@@ -34,8 +17,7 @@
       COUCHDB_PASSWORD: '{{couchdb.pwd}}'
       COUCHDB_SECRET: '{{couchdb.secret}}'
       ERL_FLAGS: '-setcookie {{couchdb.secret}} -name couchdb@{{host_ip}}'
-    exposed_ports:
-    - '5984'
+    network_mode: host
     volumes:
     - /home/couchdb/data:/mnt/data/couchdb
 
