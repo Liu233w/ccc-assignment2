@@ -17,6 +17,7 @@
       COUCHDB_PASSWORD: '{{couchdb.pwd}}'
       COUCHDB_SECRET: '{{couchdb.secret}}'
       ERL_FLAGS: '-setcookie {{couchdb.secret}} -name couchdb@{{host_ip}}'
+    # just map all ports to server because I don't want to waste time on it anymore
     network_mode: host
     volumes:
     - /home/couchdb/data:/mnt/data/couchdb
@@ -39,10 +40,9 @@
     url: http://{{head_node_ip}}:5984/_cluster_setup
     url_username: '{{couchdb.user}}'
     url_password: '{{couchdb.pwd}}'
+    force_basic_auth: yes
     method: POST
     body_format: json
-    headers:
-      Content-Type: application/json
     body:
       action: enable_cluster
       bind_address: '0.0.0.0'
@@ -53,6 +53,9 @@
       node_count: '{{node_count}}'
       remote_current_user: '{{couchdb.user}}'
       remote_current_password: '{{couchdb.pwd}}'
+    status_code:
+      - '200'
+      - '201'   # <- It does not automatically recognize 2XX codes.
   when: inventory_hostname in groups['db_workers']
 
 - name: Initialize CouchDB worker nodes
@@ -60,15 +63,17 @@
     url: http://{{head_node_ip}}:5984/_cluster_setup
     url_username: '{{couchdb.user}}'
     url_password: '{{couchdb.pwd}}'
+    force_basic_auth: yes
     method: POST
     body_format: json
-    headers:
-      Content-Type: application/json
     body:
       action: add_node
       host: '{{host_ip}}'
       username: '{{couchdb.user}}'
       password: '{{couchdb.pwd}}'
       port: '5984'
+    status_code:
+      - '200'
+      - '201'
   when: inventory_hostname in groups['db_workers']
       

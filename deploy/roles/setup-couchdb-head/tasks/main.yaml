@@ -5,7 +5,11 @@
     url: http://{{inventory_hostname}}:5984/
     url_username: '{{couchdb.user}}'
     url_password: '{{couchdb.pwd}}'
+    force_basic_auth: yes
     method: GET
+    status_code:
+      - '200'
+      - '201'
   when: inventory_hostname in groups['db_head']
 
 - name: Finish cluster setup
@@ -13,12 +17,14 @@
     url: http://{{inventory_hostname}}:5984/_cluster_setup
     url_username: '{{couchdb.user}}'
     url_password: '{{couchdb.pwd}}'
+    force_basic_auth: yes
     method: POST
     body_format: json
-    headers:
-      Content-Type: application/json
     body:
       action: finish_cluster
+    status_code:
+      - '200'
+      - '201'
   when: inventory_hostname in groups['db_head']
 
 - name: Add twitter database
@@ -26,6 +32,10 @@
     url: http://{{inventory_hostname}}:5984/twitter
     url_username: '{{couchdb.user}}'
     url_password: '{{couchdb.pwd}}'
+    force_basic_auth: yes
     method: PUT
+    status_code:
+      - '200'
+      - '201'
   when: inventory_hostname in groups['db_head']
 
