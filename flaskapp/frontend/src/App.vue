@@ -3,10 +3,42 @@
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
+      <h1>Connected: {{getConnectionStatus}}</h1>
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+import { mapActions, mapGetters, mapMutations } from 'vuex'
+
+export default {
+  name: 'App',
+
+  components: {
+  },
+
+  data: () => ({
+  }),
+
+
+  computed: {
+    ...mapGetters('msgParserSocketStore', ['getConnectionStatus']),
+  },
+
+  methods: {
+    // ...mapMutations('msgParserSocketStore', ['setSocketConnectedFlag']),
+    ...mapActions('msgParserSocketStore', ['connectSockets']),
+  },
+
+  created() {
+    this.connectSockets()
+  },
+  mounted () {
+
+  }
+};
+</script>
 
 <style lang="scss">
 #app {

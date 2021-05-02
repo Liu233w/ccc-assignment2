@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "echarts": "^5.1.1",
+    "socket.io-client": "^4.0.1",
     "vue": "^2.6.11",
     "vue-echarts": "^6.0.0-rc.5",
     "vue-router": "^3.2.0",
