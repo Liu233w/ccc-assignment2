@@ -1,5 +1,5 @@
 from os import path
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 from blueprints.services_bp import service_bp
 from sockets.msg_parser_socketio_server import MsgParserSocketIOServer
@@ -32,6 +32,13 @@ def _main():
         please do not change anything manually in dist folder or the location of it
         """
         return render_template("index.html")
+
+    @app.errorhandler(Exception)
+    def handle_all_exception(e: Exception):
+        return jsonify({
+            'error': True,
+            'message': str(e),
+        })
 
     # creates the Socket.IO socket instance
     socket_io = SocketIO(app)
