@@ -3,6 +3,7 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO
 from blueprints.services_bp import service_bp
 from sockets.msg_parser_socketio_server import MsgParserSocketIOServer
+from helpers import register_blueprints
 
 from pathlib import Path
 
@@ -17,7 +18,8 @@ def _main():
     # creates the Flask application instance
     app = Flask(__name__, static_folder=dist_folder, template_folder=dist_folder)
 
-    app.register_blueprint(service_bp)
+    register_blueprints(app, 'blueprints', ['./blueprints'])
+
     app.config.update({'DEBUG': False})
 
     @app.route('/')
