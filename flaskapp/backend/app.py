@@ -1,8 +1,9 @@
 from os import path
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 from blueprints.services_bp import service_bp
 from sockets.msg_parser_socketio_server import MsgParserSocketIOServer
+from helpers import register_blueprints
 
 from pathlib import Path
 
@@ -17,7 +18,8 @@ def _main():
     # creates the Flask application instance
     app = Flask(__name__, static_folder=dist_folder, template_folder=dist_folder)
 
-    app.register_blueprint(service_bp)
+    register_blueprints(app, 'blueprints', ['./blueprints'])
+
     app.config.update({'DEBUG': False})
 
     @app.route('/')
@@ -30,6 +32,13 @@ def _main():
         please do not change anything manually in dist folder or the location of it
         """
         return render_template("index.html")
+
+    @app.errorhandler(Exception)
+    def handle_all_exception(e: Exception):
+        return jsonify({
+            'error': True,
+            'message': str(e),
+        })
 
     # creates the Socket.IO socket instance
     socket_io = SocketIO(app)
