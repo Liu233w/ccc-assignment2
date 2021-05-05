@@ -39,15 +39,15 @@ const mutations = {
 };
 
 const actions = {
-    subscribeSocket: ({getters}) => {
+    subscribeSocket: ({ getters }) => {
         getters.getSocket.on('serviceEvent', (payload) => {
-            if (payload.topic === "eventEmitExample"){
+            if (payload.topic === "eventEmitExample") {
                 // this matches with self.emit_event(topic="eventEmitExample", payload=payload) from backend
                 console.log(`topic = "eventEmitExample", received payload = ${payload.payload}`)
             }
         })
     },
-    getProjectInfo: ({getters, commit}) => {
+    getProjectInfo: ({ getters, commit }) => {
         getters.getSocket.emit('getProjectInfo', (resp) => {
             const respObj = JSON.parse(resp)
             commit("setCourse", respObj.course)
@@ -56,7 +56,7 @@ const actions = {
             commit("setDescription", respObj.description)
         })
     },
-    testBackendEventEmitExample: ({getters}) => {
+    testBackendEventEmitExample: ({ getters }) => {
         const payload = "Communication message."
         // if no result is returned via response, then there is no need to wait for response
         getters.getSocket.emit('eventEmitExample', payload)

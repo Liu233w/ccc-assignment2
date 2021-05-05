@@ -6,23 +6,17 @@
 </template>
 
 <script>
-
 export default {
-  name: 'About',
+  name: "About",
 
-  components: {
-  },
+  components: {},
 
-  data: () => ({
-  }),
+  data: () => ({}),
 
-  computed: {
-  },
+  computed: {},
 
-  methods: {
-  },
+  methods: {},
 
-  activated(){
-  }
-}
+  activated() {},
+};
 </script>

@@ -3,43 +3,38 @@
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
-      <h1>Connected: {{getConnectionStatus}}</h1>
+      <h1>Connected: {{ getConnectionStatus }}</h1>
     </div>
     <keep-alive>
-      <router-view class="pa-0"/>
+      <router-view class="pa-0" />
     </keep-alive>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters} from 'vuex'
+import { mapActions, mapGetters } from "vuex";
 
 export default {
-  name: 'App',
+  name: "App",
 
-  components: {
-  },
+  components: {},
 
-  data: () => ({
-  }),
-
+  data: () => ({}),
 
   computed: {
-    ...mapGetters('msgParserSocketStore', ['getConnectionStatus']),
+    ...mapGetters("msgParserSocketStore", ["getConnectionStatus"]),
   },
 
   methods: {
-    ...mapActions('msgParserSocketStore', ['connectSockets']),
+    ...mapActions("msgParserSocketStore", ["connectSockets"]),
   },
 
   created() {
-    console.log("app page is created")
-    this.connectSockets()
+    console.log("app page is created");
+    this.connectSockets();
   },
 
-  activated(){
-
-  }
+  activated() {},
 };
 </script>
 

@@ -1,8 +1,8 @@
 from os import path
 from flask import Flask, render_template
 from flask_socketio import SocketIO
-from flaskapp.backend.blueprints.services_bp import service_bp
-from flaskapp.backend.sockets.msg_parser_socketio_server import MsgParserSocketIOServer
+from blueprints.services_bp import service_bp
+from sockets.msg_parser_socketio_server import MsgParserSocketIOServer
 
 from pathlib import Path
 
@@ -18,7 +18,7 @@ def _main():
     app = Flask(__name__, static_folder=dist_folder, template_folder=dist_folder)
 
     app.register_blueprint(service_bp)
-    app.config.update({'DEBUG': True})
+    app.config.update({'DEBUG': False})
 
     @app.route('/')
     def index():

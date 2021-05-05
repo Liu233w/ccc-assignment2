@@ -2,12 +2,16 @@ import Socket from 'socket.io-client'
 
 // initial state
 const state = {
+    urlAddress: `http://${location.hostname}:9797`,
     msgParserSocket: Socket(`${location.hostname}:9797/msg-parser`),
     socketConnectedFlag: false
 }
 
 // getters
 const getters = {
+    getUrlAddress: (state) => {
+        return state.urlAddress
+    },
     getSocket: (state) => {
         return state.msgParserSocket
     },
