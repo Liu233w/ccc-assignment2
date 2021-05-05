@@ -1,6 +1,6 @@
 from functools import partial
 from flask_socketio import SocketIO
-from flaskapp.backend.models.constants import EventKey
+from models.constants import EventKey
 
 
 class SocketIOServer:

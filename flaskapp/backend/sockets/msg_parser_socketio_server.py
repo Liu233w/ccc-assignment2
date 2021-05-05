@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
-from flaskapp.backend.sockets.socketio_server import SocketIOServer
-from flaskapp.backend.models.constants import EventKey
+from sockets.socketio_server import SocketIOServer
+from models.constants import EventKey
 
 
 class MsgParserSocketIOServer(SocketIOServer):
