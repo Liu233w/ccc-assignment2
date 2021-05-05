@@ -5,7 +5,7 @@
 <script>
 import { THEME_KEY } from "vue-echarts";
 export default {
-  name: "HelloWorld",
+  name: "Chart",
   provide: {
     [THEME_KEY]: "dark"
   },

@@ -17,7 +17,7 @@ const routes = [
     children: [
       {
         path: 'chart',
-        Name: 'ChartView',
+        name: 'ChartView',
         component: () => import('../views/ChartView.vue')
       }
     ]

@@ -7,10 +7,12 @@
 </template>
 
 <script>
+import Chart from '../components/Chart.vue'
+
 export default {
-  name: "ChartVIew",
-  component: {
-    Chart: () => import('../components/Chart.vue')
+  name: "ChartView",
+  components: {
+    Chart,
   }
 }
 </script>
