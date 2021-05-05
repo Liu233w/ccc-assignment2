@@ -2,22 +2,16 @@
   <div class="home">
       <v-container fluid class="px-2">
         <v-row dense>
+          <v-col cols="12">
             <h1>{{getCourse}}</h1>
             <h2>{{getTitle}}</h2>
             <p>{{getMembers}}</p>
             <p>{{getDescription}}</p>
-            <v-btn
-              color="red lighten-2"
-              dark
-            >
-              Click Me
+            <v-btn @click="postRequestToBackendHandler()">
+              Post To Backend
             </v-btn>
-            <!-- <v-col cols="2" class="pa-0" align-self="center">
-              <v-btn @click="postRequestToBackend()">
-                Post To Backend
-              </v-btn>
-              <p>Post Request Response: {{ postRequestResponse }}</p>
-            </v-col> -->
+            <p>Post Request Response: {{ postRequestResponse }}</p>
+          </v-col>
         </v-row>
   </div>
 </template>
@@ -43,18 +37,30 @@ export default {
 
   methods: {
     ...mapActions('homePanelStore', ['getProjectInfo', 'subscribeSocket', 'testBackendEventEmitExample']),
+    
     postRequestToBackend() {
-            const urlAddress = `${this.getUrlAddress}:9797}:/api/services/post-example`
+            this.postRequestResponse = ""
+            // urlAddress: 'http://localhost:9797/api/services/post-example'
+            const urlAddress = `${this.getUrlAddress}/api/services/post-example`
             const payload = {"request": "post request from frontend"}
-            return axios.post(urlAddress,
-                payload
-        ).then(function (resp) {
-            // returned response from back-end is in format {"response": "post request is successful"}
-            this.postRequestResponse = resp.reponse
-          }
-        ).catch(function () {
-            console.log('Failed to handle post request!')
-        });
+            return axios.post(urlAddress, payload).then(function (resp) {
+                // resp: data,[object Object],status,200,statusText,OK,headers,[object Object],config,[object Object],request,[object XMLHttpRequest]
+                // data returned from backend is contained in: resp.data
+                // resp.data = {"response": "post request is successful"} <- response from backend
+                let result = resp.data.response
+                console.log(`post request result received: ${result}`)
+                return result
+              }
+            ).catch(err => {
+                console.log(`${err}`)
+                return err
+            });
+    },
+    postRequestToBackendHandler() {
+        const returnResult = this.postRequestToBackend()
+        returnResult.then((resp) => {
+            this.postRequestResponse = resp
+        })
     }
   },
 

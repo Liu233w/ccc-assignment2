@@ -5,8 +5,8 @@ service_bp = Blueprint('service_bp', __name__, url_prefix='/api/services')
 
 
 @service_bp.route('/post-example', methods=['POST'])
-def config_uploader():
-
+def post_example():
+    print(f"/post-example triggered: request method: {request.method}")
     if request.method == 'POST':
         try:
             requested_data = request.json
