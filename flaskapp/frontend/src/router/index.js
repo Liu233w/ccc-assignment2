@@ -11,12 +11,17 @@ const routes = [
     component: () => import('../views/Home.vue'),
   },
   {
-    path: '/',
+    path: '/demo',
     name: 'Default',
     component: () => import('../layout/Index.vue'),
     children: [
       {
-        path: 'chart',
+        path: '',
+        name: 'MapView',
+        component: () => import('../views/MapView.vue')
+      },
+      {
+        path: '/chart',
         name: 'ChartView',
         component: () => import('../views/ChartView.vue')
       }

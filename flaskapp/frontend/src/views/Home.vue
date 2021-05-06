@@ -27,7 +27,7 @@
           rounded
           color="primary"
           dark
-          @click="$router.push('/chart')"
+          @click="$router.push('/demo')"
       >
         Enter Demo
       </v-btn>

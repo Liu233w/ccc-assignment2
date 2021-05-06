@@ -1,25 +1,28 @@
 const state = {
-    token: ''
+    token: 'AIzaSyBObuayOsssm6Zkmi46aRDizkbdr1wJSGo'
 }
 
-const mutation = {
+const mutations = {
     setToken(state, payload) {
         state.token = payload
     }
 }
 
-const action = {
+const actions = {
 
 }
 
-const getter = {
-
+const getters = {
+    getToken(){
+        return state.token
+    }
 }
 
 export default {
+    namespaced: true,
     state,
-    mutation,
-    action,
-    getter
+    mutations,
+    actions,
+    getters,
 }
 

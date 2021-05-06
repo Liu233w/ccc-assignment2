@@ -5,6 +5,7 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import ECharts from 'vue-echarts'
 import { use } from 'echarts/core'
+import * as GmapVue from 'gmap-vue'
 
 Vue.config.productionTip = false
 
@@ -29,6 +30,13 @@ use([
 
 // Register Echarts globally
 Vue.component('v-chart', ECharts)
+
+Vue.use(GmapVue, {
+  load: {
+    key: 'AIzaSyBObuayOsssm6Zkmi46aRDizkbdr1wJSGo',
+  },
+  installComponents: true
+})
 
 new Vue({
   router,

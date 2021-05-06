@@ -90,7 +90,8 @@
 
     <v-main>
       <v-container>
-        <router-view />
+<!--        <router-view :key="this.$route.path" />-->
+        <router-view/>
       </v-container>
     </v-main>
 
