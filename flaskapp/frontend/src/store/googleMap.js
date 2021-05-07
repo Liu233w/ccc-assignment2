@@ -1,5 +1,16 @@
 const state = {
-    token: 'AIzaSyBObuayOsssm6Zkmi46aRDizkbdr1wJSGo'
+    token: 'AIzaSyBObuayOsssm6Zkmi46aRDizkbdr1wJSGo',
+    options: {
+        zoomControl: true,
+        mapTypeControl: false,
+        scaleControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: true,
+        disableDefaultUi: false,
+        zoom: 7,
+        style: "width: 500px; height: 300px"
+    }
 }
 
 const mutations = {
