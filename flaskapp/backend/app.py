@@ -37,7 +37,7 @@ def _main():
     def handle_all_exception(e: Exception):
         return jsonify({
             'error': True,
-            'message': str(e),
+            'message': str(type(e)) + ': ' + str(e),
         })
 
     # creates the Socket.IO socket instance
