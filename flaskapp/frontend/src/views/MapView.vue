@@ -2,23 +2,24 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <GmapMap :options="mapConfig" :center="center" style="width: 500px; height: 300px">
+        <GmapMap :options="mapConfig" :center="center" class="google-map">
           <GmapInfoWindow
               :options="infoOptions"
               :position="infoWindowPos"
               :opened="infoWinOpen"
               @closeclick="infoWinOpen=false"
-              ref="infoWindow"
-          />
-<!--&lt;!&ndash;          <GmapMarker&ndash;&gt;-->
-<!--&lt;!&ndash;              :key="index"&ndash;&gt;-->
-<!--&lt;!&ndash;              v-for="(m, index) in markers"&ndash;&gt;-->
-<!--&lt;!&ndash;              :position="m.position"&ndash;&gt;-->
-<!--&lt;!&ndash;              :clickable="true"&ndash;&gt;-->
-<!--&lt;!&ndash;              :draggable="true"&ndash;&gt;-->
-<!--&lt;!&ndash;              @click="center=m.position"&ndash;&gt;-->
-<!--&lt;!&ndash;          />&ndash;&gt;-->
-
+              class="info-window"
+          >
+            <Chart/>
+          </GmapInfoWindow>
+          <GmapPolygon
+              v-for="(r, i) in regions"
+              :key="i"
+              :paths="r.path"
+              :editable="true"
+              @click="toggleInfoWindow(r)"/>
+          <!--                       @paths_changed="updateEdited($event)"-->
+          <!--          />-->
         </GmapMap>
       </v-col>
     </v-row>
@@ -28,28 +29,41 @@
 <script>
 // import GoogleMapLoader from "@/components/GoogleMapLoader";
 // import GoogleMapMarker from "@/components/GoogleMapMarker";
+import Chart from "@/components/Chart";
 
 export default {
   name: "Map",
-  // components: {
-  //   GoogleMapLoader,
-  //   // GoogleMapMarker
-  // },
+  components: {
+    Chart
+  },
 
   data() {
     return {
-      markers: [
+      // User's current location
+      location: null,
+
+      regions: [
         {
-          id: "a",
-          position: {lat: 3, lng: 101}
+          id: 1,
+          name: "City",
+          position: {lat: -37.728743, lng: 144.95226},
+          path: [
+            {lat: -37.685788, lng: 144.890531},
+            {lat: -37.685788, lng: 145.013989},
+            {lat: -37.771697, lng: 145.013989},
+            {lat: -37.771697, lng: 144.890531}
+          ]
         },
         {
-          id: "b",
-          position: {lat: 5, lng: 99}
-        },
-        {
-          id: "c",
-          position: {lat: 6, lng: 97}
+          id: 2,
+          name: "Carlton",
+          position: {lat: -37.842533, lng: 145.077912},
+          path: [
+            {lat: -37.830673, lng: 145.055752},
+            {lat: -37.830673, lng: 145.100077},
+            {lat: -37.854393, lng: 145.100077},
+            {lat: -37.854393, lng: 145.055752}
+          ]
         }
       ],
 
@@ -61,7 +75,6 @@ export default {
 
       //  Info Window
       infoOptions: {
-        content: 'Find You!',
         //optional: offset infowindow so it visually sits nicely on top of our marker
         pixelOffset: {
           width: 0,
@@ -70,8 +83,6 @@ export default {
       },
       infoWindowPos: null,
       infoWinOpen: false,
-
-
     }
   },
 
@@ -92,7 +103,7 @@ export default {
         console.log('geo')
         navigator.geolocation.getCurrentPosition(
             (position) => {
-              this.infoWindowPos = {
+              this.location = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
               };
@@ -107,6 +118,11 @@ export default {
         alert("Error: Your browser doesn't support geolocation.")
       }
     },
+
+    toggleInfoWindow: function (region) {
+      this.infoWindowPos = region.position;
+      this.infoWinOpen = true
+    }
   },
 
   created() {
@@ -115,6 +131,7 @@ export default {
   mounted() {
 
     this.getCurrentLocation()
+    // this.setInfoWindowContent()
 
   }
 
@@ -122,5 +139,13 @@ export default {
 </script>
 
 <style scoped>
+.google-map {
+  width: 100%;
+  height: 650px;
+}
 
+.info-window {
+  width: 150px;
+  height: 200px;
+}
 </style>

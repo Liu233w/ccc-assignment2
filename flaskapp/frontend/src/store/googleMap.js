@@ -8,7 +8,8 @@ const state = {
         rotateControl: false,
         fullscreenControl: true,
         disableDefaultUi: false,
-        zoom: 7,
+        zoom: 10,
+        center: {lat: -37.840935, lng: 144.946457},
         style: "width: 500px; height: 300px"
     }
 }

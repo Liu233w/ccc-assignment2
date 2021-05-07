@@ -16,6 +16,11 @@ import {
   TooltipComponent,
   LegendComponent,
   DatasetComponent,
+  ToolboxComponent,
+  DataZoomComponent,
+  VisualMapComponent,
+  TimelineComponent,
+  CalendarComponent
 } from "echarts/components";
 
 use([
@@ -25,7 +30,12 @@ use([
   DatasetComponent,
   TitleComponent,
   TooltipComponent,
-  LegendComponent
+  LegendComponent,
+  ToolboxComponent,
+  DataZoomComponent,
+  VisualMapComponent,
+  TimelineComponent,
+  CalendarComponent
 ]);
 
 // Register Echarts globally

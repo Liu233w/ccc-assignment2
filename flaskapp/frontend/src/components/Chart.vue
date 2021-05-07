@@ -7,7 +7,7 @@ import { THEME_KEY } from "vue-echarts";
 export default {
   name: "Chart",
   provide: {
-    [THEME_KEY]: "dark"
+    [THEME_KEY]: "shine" // dark, vintage, macarons, infographic, roma
   },
   data() {
     return {
@@ -15,24 +15,24 @@ export default {
         dataset: {
           dimensions: ['value', 'name'],
           source: [
-            { value: 335, name: "Direct" },
-            { value: 310, name: "Email" },
-            { value: 234, name: "Ad Networks" },
-            { value: 135, name: "Video Ads" },
-            { value: 1548, name: "Search Engines" }
+            { value: 335, name: "Pets" },
+            { value: 310, name: "IT" },
+            { value: 234, name: "Cars" },
+            { value: 135, name: "Sports" },
+            { value: 1548, name: "Food" }
           ]
         },
 
         title: {
-          text: "Traffic Sources",
-          left: "center"
+          text: "Suburb",
+          left: 'center'
         },
 
         // tooltip: {},
 
         legend: {
-          left: 'left',
-          orient: "vertical"
+          bottom: 'bottom',
+          orient: "horizontal"
         },
 
         tooltip: {
@@ -57,10 +57,14 @@ export default {
             name: "Traffic Sources",
             type: "pie",
             radius: "55%",
-            center: ["50%", "60%"],
+            center: ["50%", "50%"],
             label: {
-              formatter: '{@name}: {@value} ({d}%)'
+              show: false,
+              position: 'center'
             },
+            // label: {
+            //   formatter: '{@name}: {@value} ({d}%)'
+            // },
             encode: {
               value: 0,
               itemName: 1, //'name'
@@ -83,5 +87,6 @@ export default {
 <style scoped>
 .chart {
   height: 400px;
+  width: 600px;
 }
 </style>

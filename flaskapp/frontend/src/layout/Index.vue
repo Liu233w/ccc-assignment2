@@ -89,10 +89,9 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container>
-<!--        <router-view :key="this.$route.path" />-->
-        <router-view/>
-      </v-container>
+      <!--        <router-view :key="this.$route.path" />-->
+      <router-view/>
+
     </v-main>
 
     <v-footer
@@ -114,7 +113,9 @@
 </template>
 
 <script>
+
 export default {
+
   name: "Index",
   data: () => ({drawer: null}),
   components: {
