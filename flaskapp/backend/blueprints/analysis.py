@@ -10,7 +10,29 @@ twitter = couchdb['twitter']
 @bp.route('/', methods=['GET'])
 def list_views():
   '''
-  return all analysis
+  return all analysis (couchDB views)
+  ---
+  responses:
+    200:
+      description: A list of couchDB views definitions
+      schema:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              description: The id of the view
+            view:
+              type: object
+              description: The content of the view
+              properties:
+                map:
+                  type: string
+                  description: the mapper function
+                reduce:
+                  type: string
+                  description: the reduce function, it can be `_sum`, `_count` or predefined javascript function. It can be omitted.
   '''
   views = twitter.resource.get_json('_design_docs')[2]
   res = []
@@ -28,12 +50,36 @@ def list_views():
 @bp.route('/<id>', methods=['PUT'])
 def put_view(id):
   """
-  Update an analysis
-  :id the id
-  body: {
-    map: 'A function',
-    reduce: '_count or _sum'
-  }
+  Update a view
+  ---
+  consumes:
+    - application/json
+  parameters:
+    - in: path
+      name: id
+      required: true
+      type: string
+      description: The id of the view
+    - in: body
+      description: The functions of the view
+      required: true
+      schema:
+        type: object
+        properties:
+          map:
+            type: string
+            description: the mapper function
+          reduce:
+            type: string
+            description: the reduce function, it can be `_sum`, `_count` or predefined javascript function. It can be omitted.
+        example: |
+          {
+              "map": "function (doc) { emit(doc.author_id, 1); }",
+              "reduce": "_count"
+          }
+  responses:
+    200:
+      description: Success
   """
 
   doc = twitter.get('_design/'+id)
@@ -57,7 +103,19 @@ def put_view(id):
 @bp.route('/<id>/record', methods=['GET'])
 def get_records(id):
   '''
-  Get all records of an id
+  Get all records of a view by view id
+  ---
+  parameters:
+    - in: path
+      name: id
+      required: true
+      type: string
+      description: The id of the view
+
+  responses:
+    200:
+      description: The result of the view
+      schema:
   '''
   res = list(twitter.view(id+'/all', group=True))
   return jsonify({

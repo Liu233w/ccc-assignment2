@@ -12,3 +12,4 @@ six==1.15.0
 Werkzeug==1.0.1
 couchdb
 python-dotenv
+flasgger

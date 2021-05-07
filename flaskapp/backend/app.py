@@ -4,6 +4,7 @@ from flask_socketio import SocketIO
 from blueprints.services_bp import service_bp
 from sockets.msg_parser_socketio_server import MsgParserSocketIOServer
 from helpers import register_blueprints
+import flasgger
 
 from pathlib import Path
 
@@ -35,10 +36,17 @@ def _main():
 
     @app.errorhandler(Exception)
     def handle_all_exception(e: Exception):
+        print(e)
         return jsonify({
             'error': True,
-            'message': str(type(e)) + ': ' + str(e),
+            'message': type(e).__name__ + ': ' + str(e),
         })
+
+    app.config['SWAGGER'] = {
+        'title': 'API of CCC Assignment 2',
+        'swagger_version': '2.0',
+    }
+    swagger = flasgger.Swagger(app)
 
     # creates the Socket.IO socket instance
     socket_io = SocketIO(app)
