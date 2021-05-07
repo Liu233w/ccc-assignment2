@@ -50,8 +50,12 @@ export default {
     getRequestResponse: ""
   }),
 
+
   computed: {
-    ...mapGetters("msgParserSocketStore", ["getUrlAddress"]),
+    ...mapGetters("msgParserSocketStore", [
+      "getUrlAddress",
+      "getConnectionStatus"
+    ]),
     ...mapGetters("homePanelStore", [
       "getCourse",
       "getTitle",
@@ -132,5 +136,7 @@ export default {
   activated() {
     this.testBackendEventEmitExample();
   },
+
+
 };
 </script>
