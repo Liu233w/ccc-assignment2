@@ -33,15 +33,8 @@ def _main():
         """
         return render_template("index.html")
 
-    @app.errorhandler(Exception)
-    def handle_all_exception(e: Exception):
-        return jsonify({
-            'error': True,
-            'message': str(e),
-        })
-
     # creates the Socket.IO socket instance
-    socket_io = SocketIO(app)
+    socket_io = SocketIO(api)
     socketio_server = {'msg-parser': MsgParserSocketIOServer(
         socketio=socket_io, namespace='/msg-parser', application_path=application_path)}
 

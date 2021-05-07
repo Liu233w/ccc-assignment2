@@ -10,3 +10,4 @@ python-engineio==4.1.0
 python-socketio==5.2.1
 six==1.15.0
 Werkzeug==1.0.1
+flask_restplus
