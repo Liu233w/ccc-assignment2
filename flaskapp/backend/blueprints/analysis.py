@@ -121,3 +121,28 @@ def get_records(id):
   return jsonify({
     'result': res
   })
+
+@bp.route('/<id>', methods=['DELETE'])
+def remove_view(id):
+  '''
+  Remove a view by id
+  ---
+  parameters:
+    - in: path
+      name: id
+      required: true
+      type: string
+      description: The id of the view
+
+  responses:
+    200:
+      description: Success
+      schema:
+  '''
+
+  doc = twitter.get('_design/'+id)
+  twitter.delete(doc)
+
+  return jsonify({
+    'success': True,
+  })
