@@ -33,6 +33,9 @@ def list_views():
                 reduce:
                   type: string
                   description: the reduce function, it can be `_sum`, `_count` or predefined javascript function. It can be omitted.
+            recordUrl:
+              type: string
+              description: the url of the records in the view
   '''
   views = twitter.resource.get_json('_design_docs')[2]
   res = []
@@ -41,9 +44,11 @@ def list_views():
     view = doc.get('views') and doc.get('views').get('all')
     if not view:
       continue
+    id = item['id'].split('/')[1]
     res.append({
-      'id': item['id'].split('/')[1],
+      'id': id,
       'view': view,
+      'recordUrl': f'/{id}/record'
     })
   return jsonify(res)
 
@@ -80,6 +85,25 @@ def put_view(id):
   responses:
     200:
       description: Success
+      schema:
+        type: object
+        properties:
+          id:
+            type: string
+            description: The id of the view
+          view:
+            type: object
+            description: The content of the view
+            properties:
+              map:
+                type: string
+                description: the mapper function
+              reduce:
+                type: string
+                description: the reduce function, it can be `_sum`, `_count` or predefined javascript function. It can be omitted.
+          recordUrl:
+            type: string
+            description: the url of the records in the view
   """
 
   doc = twitter.get('_design/'+id)
@@ -97,7 +121,9 @@ def put_view(id):
 
   twitter.save(doc)
   return jsonify({
-    'success': True
+    'id': id,
+    'view': view,
+    'recordUrl': f'/{id}/record'
   })
 
 @bp.route('/<id>/record', methods=['GET'])
