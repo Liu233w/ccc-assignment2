@@ -8,7 +8,7 @@ The Steps to Classify a tweet defined on the `predict_tweets.py` script are as f
  - Call `GetTweetPrediction.Get_Prediction(tweet_text, model, tokenizer).Get_Tweet_Prediction()` to classify tweet
 
 
-NOTE: `tweet_text` is the tweet text you want to classify
+**NOTE**: `tweet_text` is the tweet text you want to classify
 
 The `GetTweetPrediction` script classifies the tweet_text into the defined 10 classes.
 
