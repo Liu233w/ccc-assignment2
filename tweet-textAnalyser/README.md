@@ -1,7 +1,7 @@
 ## The `predict_tweet.py` script is an example for predicting one tweet at a time
 
 
-The Steps to Classify a tweet are as follows:
+The Steps to Classify a tweet defined on the `predict_tweet.py` script are as follows:
  - Import the `GetTweetPrediction` script
  - Define the path to the BERT_Classification_Model
  - Call `Load_Model` function with path to BERT_Classification_Model and get `model` and `tokenizer`
