@@ -15,3 +15,17 @@ The Steps to Classify a tweet defined on the `predict_tweets.py` script are as f
 The `GetTweetPrediction` script classifies the tweet_text into the defined 10 classes.
 
 IF the prediction probability of the predicted class is less than the `threshold` value, it classifies the tweet as `OTHER` class.
+
+
+## Classes
+ - entertainment
+ - business
+ - technology
+ - gaming
+ - music
+ - sports
+ - politics
+ - fashion
+ - health
+ - food
+ - OTHER
