@@ -2,7 +2,7 @@
 
 
 The Steps to Classify a tweet defined on the `predict_tweets.py` script are as follows:
- - Import the `GetTweetPrediction` script
+ - Import the `GetTweetPrediction.py` script
  - Define the path to the BERT_Classification_Model
  - Call `Load_Model` function with path to BERT_Classification_Model and get `model` and `tokenizer`
  - Call `GetTweetPrediction.Get_Prediction(tweet_text, model, tokenizer).Get_Tweet_Prediction()` to classify tweet
