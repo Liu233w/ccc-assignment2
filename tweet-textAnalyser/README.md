@@ -1,4 +1,4 @@
-# The `predict_tweet.py` script is an example fpr predicting one tweet at a time
+## The `predict_tweet.py` script is an example for predicting one tweet at a time
 
 
 The Steps to Classify a tweet are as follows:
