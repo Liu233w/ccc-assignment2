@@ -12,18 +12,13 @@ const routes = [
   },
   {
     path: '/demo',
-    name: 'Default',
+    name: 'Demo',
     component: () => import('../layout/Index.vue'),
     children: [
       {
         path: '',
         name: 'MapView',
         component: () => import('../views/MapView.vue')
-      },
-      {
-        path: '/chart',
-        name: 'ChartView',
-        component: () => import('../views/ChartView.vue')
       }
     ]
   },

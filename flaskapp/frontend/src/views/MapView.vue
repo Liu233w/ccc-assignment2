@@ -4,9 +4,27 @@
       <v-col cols="12">
         <GmapMap :options="mapConfig" :center="center" class="google-map" ref="mapRef">
 
-          <!--          <GmapAutocomplete-->
-          <!--              placeholder="This is a placeholder text"/>-->
-          <!--&lt;!&ndash;              @place_changed="setPlace"&ndash;&gt;-->
+          <template #visible>
+            <v-row>
+              <v-col cols="4">
+                <v-spacer/>
+                <GmapAutocomplete>
+                  <template v-slot:input>
+                    <v-text-field outlined
+                                  background-color="#EEEEEE"
+                                  placeholder="Locations or Topics"
+                                  append-icon="mdi-map-marker"
+                                  ref="input"
+                                  v-model="user_input"
+                                  @keydown.enter.native="queryLocation"
+                    >
+                    </v-text-field>
+                  </template>
+                </GmapAutocomplete>
+              </v-col>
+            </v-row>
+          </template>
+
 
           <GmapInfoWindow
               :options="infoOptions"
@@ -24,9 +42,7 @@
               :paths="r.path"
               :editable="false"
               @click="toggleInfoWindow(r)"/>
-          <!--          <GmapMarker v-for="(m,i) in markers" :key="i" :position="m.position" :clickable="true" :draggable="true" @click="center=m.position"/>-->
-          <!--                       @paths_changed="updateEdited($event)"-->
-          <!--          />-->
+
         </GmapMap>
       </v-col>
     </v-row>
@@ -37,7 +53,7 @@
 // import GoogleMapLoader from "@/components/GoogleMapLoader";
 // import GoogleMapMarker from "@/components/GoogleMapMarker";
 import Chart from "@/components/Chart";
-import {getAllPolygons} from "@/utils/getPolygons.js"
+import {getAllPolygons, getPolygonsByNames} from "@/utils/getPolygons.js"
 
 // eslint-disable-next-line no-unused-vars
 
@@ -51,7 +67,12 @@ export default {
     return {
       // User's current location
       location: null,
-      regions:  [],
+
+      // User's input
+      user_input: null,
+
+      // Suburbs
+      regions: [],
 
       // Gmap
       center: {
@@ -86,9 +107,7 @@ export default {
   methods: {
 
     getCurrentLocation() {
-      console.log('1')
       if (navigator.geolocation) {
-        console.log('geo')
         navigator.geolocation.getCurrentPosition(
             (position) => {
               this.location = {
@@ -112,16 +131,23 @@ export default {
       this.infoWinOpen = true
     },
 
-    handleMarkerClick() {
-
-    }
+    queryLocation() {
+      // Todo: User Input Regularization. Default is splitting by ' '. But Box Hill...?
+      // names is an arrays
+      const names = this.user_input.split(' ')
+      try {
+        getPolygonsByNames(names).then(res => this.regions = res)
+      }catch (err) {
+        console.log(err)
+      }
+    },
   },
 
   created() {
     this.regions = getAllPolygons()
   },
 
-  async mounted() {
+  mounted() {
 
     this.getCurrentLocation()
     // this.setInfoWindowContent()
@@ -139,5 +165,10 @@ export default {
 .info-window {
   width: 150px;
   height: 200px;
+}
+
+.input-box {
+  width: 100%;
+  height: 40px;
 }
 </style>

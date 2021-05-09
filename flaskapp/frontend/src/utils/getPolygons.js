@@ -34,29 +34,29 @@
 
 import * as data from '../assets/jsonfile/polygons.json'
 
-export function getPolygonsByNames(names) {
+export async function getPolygonsByNames(names) {
 
     const names_lowercase = names.map(item => item.toLowerCase())
-    /*
-    const regions = []
+    let regions = []
     names_lowercase.forEach((value, index) => {
         let region = data["features"].find(obj => obj["properties"]["name"].toLowerCase() === value);
 
         // TODO: names may be illegal
         if (region === undefined) {
             // do something...
-            console.log("Region name is not correct")
-        }
-        else {
+            throw "Region name is not correct"
+        } else {
             const coordinates = region["geometry"]["coordinates"][0][0]
-            const arr_length = coordinates.length
-            const region_polygon = coordinates.map(item => new window.google.maps.LatLng(item[0], item[1]))
+            // const arr_length = coordinates.length
+            const region_polygon = coordinates.map(item => ({lng: item[0], lat: item[1]}))
+            const lat = coordinates.map(item => item[1])
+            const lng = coordinates.map(item => item[0])
             regions.push(
                 {
                     name: names[index],
                     region_center: {
-                        lat: coordinates.reduce((acc, value) => acc + value[0], 0) / arr_length,
-                        lng: coordinates.reduce((acc, value) => acc + value[1], 0) / arr_length
+                        lat: (Math.max(...lat) + Math.min(...lat)) / 2,
+                        lng: (Math.max(...lng) + Math.min(...lng)) / 2,
                     },
                     path: region_polygon
                 }
@@ -64,25 +64,23 @@ export function getPolygonsByNames(names) {
         }
     })
 
-     */
-
-    return names_lowercase
+    return regions
 
 }
 
 export function getAllPolygons() {
 
     let regions = []
-    data["features"].forEach( obj => {
+    data["features"].forEach(obj => {
         const coordinates = obj["geometry"]["coordinates"][0][0]
-        console.log(obj["properties"]["name"])
-        const arr_length = coordinates.length
         const region_polygon = coordinates.map(item => ({lng: item[0], lat: item[1]}))
+        const lat = coordinates.map(item => item[1])
+        const lng = coordinates.map(item => item[0])
         regions.push(Object.freeze({
             name: obj["properties"]["name"],
             region_center: {
-                lat: coordinates.reduce((acc, value) => acc + value[1], 0) / arr_length,
-                lng: coordinates.reduce((acc, value) => acc + value[0], 0) / arr_length
+                lat: (Math.max(...lat) + Math.min(...lat)) / 2,
+                lng: (Math.max(...lng) + Math.min(...lng)) / 2,
             },
             path: region_polygon,
         }))
