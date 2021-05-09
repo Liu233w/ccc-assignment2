@@ -163,7 +163,7 @@ export default {
       // names is an arrays
       this.infoWinOpen = false
       this.regions = []
-      const names = this.user_input.split(' ')
+      const names = this.user_input.split(',')
       try {
         getPolygonsByNames(names).then(res => this.regions = res)
       } catch (err) {

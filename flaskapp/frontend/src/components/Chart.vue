@@ -24,7 +24,8 @@ export default {
             {value: 310, name: "IT"},
             {value: 234, name: "Cars"},
             {value: 135, name: "Sports"},
-            {value: 1548, name: "Food"}
+            {value: 1548, name: "Food"},
+            {value: 500, name: "Others"}
           ]
         },
 

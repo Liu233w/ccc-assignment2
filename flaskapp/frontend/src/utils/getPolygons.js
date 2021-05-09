@@ -39,7 +39,7 @@ export async function getPolygonsByNames(names) {
     const names_lowercase = names.map(item => item.toLowerCase())
     let regions = []
     names_lowercase.forEach((value, index) => {
-        let region = data["features"].find(obj => obj["properties"]["name"].toLowerCase() === value);
+        let region = data["features"].find(obj => obj["properties"]["name"].toLowerCase() === value.trim());
 
         // TODO: names may be illegal
         if (region === undefined) {
