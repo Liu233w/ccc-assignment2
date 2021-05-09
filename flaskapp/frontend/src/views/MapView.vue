@@ -2,7 +2,12 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <GmapMap :options="mapConfig" :center="center" class="google-map">
+        <GmapMap :options="mapConfig" :center="center" class="google-map" ref="mapRef">
+
+          <!--          <GmapAutocomplete-->
+          <!--              placeholder="This is a placeholder text"/>-->
+          <!--&lt;!&ndash;              @place_changed="setPlace"&ndash;&gt;-->
+
           <GmapInfoWindow
               :options="infoOptions"
               :position="infoWindowPos"
@@ -12,12 +17,14 @@
           >
             <Chart/>
           </GmapInfoWindow>
+
           <GmapPolygon
               v-for="(r, i) in regions"
               :key="i"
               :paths="r.path"
-              :editable="true"
+              :editable="false"
               @click="toggleInfoWindow(r)"/>
+          <!--          <GmapMarker v-for="(m,i) in markers" :key="i" :position="m.position" :clickable="true" :draggable="true" @click="center=m.position"/>-->
           <!--                       @paths_changed="updateEdited($event)"-->
           <!--          />-->
         </GmapMap>
@@ -30,6 +37,9 @@
 // import GoogleMapLoader from "@/components/GoogleMapLoader";
 // import GoogleMapMarker from "@/components/GoogleMapMarker";
 import Chart from "@/components/Chart";
+import {getAllPolygons} from "@/utils/getPolygons.js"
+
+// eslint-disable-next-line no-unused-vars
 
 export default {
   name: "Map",
@@ -41,31 +51,7 @@ export default {
     return {
       // User's current location
       location: null,
-
-      regions: [
-        {
-          id: 1,
-          name: "City",
-          position: {lat: -37.728743, lng: 144.95226},
-          path: [
-            {lat: -37.685788, lng: 144.890531},
-            {lat: -37.685788, lng: 145.013989},
-            {lat: -37.771697, lng: 145.013989},
-            {lat: -37.771697, lng: 144.890531}
-          ]
-        },
-        {
-          id: 2,
-          name: "Carlton",
-          position: {lat: -37.842533, lng: 145.077912},
-          path: [
-            {lat: -37.830673, lng: 145.055752},
-            {lat: -37.830673, lng: 145.100077},
-            {lat: -37.854393, lng: 145.100077},
-            {lat: -37.854393, lng: 145.055752}
-          ]
-        }
-      ],
+      regions:  [],
 
       // Gmap
       center: {
@@ -83,13 +69,15 @@ export default {
       },
       infoWindowPos: null,
       infoWinOpen: false,
+
+      // Marker
+      markers: [{
+        position: this.center
+      }]
     }
   },
 
   computed: {
-    mapToken() {
-      return this.$store.state.googleMap.token
-    },
     mapConfig() {
       return this.$store.state.googleMap.options
     }
@@ -119,20 +107,24 @@ export default {
       }
     },
 
-    toggleInfoWindow: function (region) {
-      this.infoWindowPos = region.position;
+    toggleInfoWindow(region) {
+      this.infoWindowPos = region.region_center;
       this.infoWinOpen = true
+    },
+
+    handleMarkerClick() {
+
     }
   },
 
   created() {
+    this.regions = getAllPolygons()
   },
 
-  mounted() {
+  async mounted() {
 
     this.getCurrentLocation()
     // this.setInfoWindowContent()
-
   }
 
 }
