@@ -1,30 +1,35 @@
 <template>
-  <v-chart class="chart" :option="option" />
+  <v-chart class="chart" :option="option"/>
 </template>
 
 <script>
-import { THEME_KEY } from "vue-echarts";
+import {THEME_KEY} from "vue-echarts";
+
 export default {
   name: "Chart",
   provide: {
     [THEME_KEY]: "shine" // dark, vintage, macarons, infographic, roma
   },
+
+  props: ['rename'],
+
   data() {
     return {
+
       option: {
         dataset: {
           dimensions: ['value', 'name'],
           source: [
-            { value: 335, name: "Pets" },
-            { value: 310, name: "IT" },
-            { value: 234, name: "Cars" },
-            { value: 135, name: "Sports" },
-            { value: 1548, name: "Food" }
+            {value: 335, name: "Pets"},
+            {value: 310, name: "IT"},
+            {value: 234, name: "Cars"},
+            {value: 135, name: "Sports"},
+            {value: 1548, name: "Food"}
           ]
         },
 
         title: {
-          text: "Suburb",
+          text: 'suburb',
           left: 'center'
         },
 
@@ -80,6 +85,16 @@ export default {
         ]
       }
     }
+  },
+
+  methods: {
+
+    // setChartTitle() {
+    //   const new_option = this.option
+    //   this.option.title.text = this.rename
+    //   this.option = new_option
+    // }
+
   }
 }
 </script>

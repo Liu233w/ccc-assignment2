@@ -5,26 +5,26 @@
         <GmapMap :options="mapConfig" :center="center" class="google-map" ref="mapRef">
 
           <template #visible>
-            <v-row>
-              <v-col cols="4">
-                <v-spacer/>
-                <GmapAutocomplete>
-                  <template v-slot:input>
-                    <v-text-field outlined
-                                  background-color="#EEEEEE"
-                                  placeholder="Locations"
-                                  append-icon="mdi-map-marker"
-                                  ref="input"
-                                  v-model="user_input"
-                                  @keydown.enter.native="queryLocation"
-                    >
-                    </v-text-field>
-                  </template>
-                </GmapAutocomplete>
-              </v-col>
-            </v-row>
+            <v-container>
+              <v-row>
+                <v-col cols="4">
+                  <GmapAutocomplete>
+                    <template v-slot:input>
+                      <v-text-field outlined
+                                    background-color="#F5F5F5"
+                                    placeholder="Locations"
+                                    append-icon="mdi-map-marker"
+                                    ref="input"
+                                    v-model="user_input"
+                                    @keydown.enter.native="queryLocation"
+                      >
+                      </v-text-field>
+                    </template>
+                  </GmapAutocomplete>
+                </v-col>
+              </v-row>
+            </v-container>
           </template>
-
 
           <GmapInfoWindow
               :options="infoOptions"
@@ -33,16 +33,18 @@
               @closeclick="infoWinOpen=false"
               class="info-window"
           >
-            <Chart/>
+            <Chart :rename="this.region_onClick"/>
           </GmapInfoWindow>
 
           <GmapPolygon
               v-for="(r, i) in regions"
               :key="i"
               :paths="r.path"
-              :editable="false"
-              @click="toggleInfoWindow(r)"/>
-
+              :options = "{...polygon_options, ...extra_options[r.name]}"
+              @mouseover="togglePolygon(r, true)"
+              @mouseout="togglePolygon(r, false)"
+              @click="toggleInfoWindow(r)"
+          />
         </GmapMap>
       </v-col>
     </v-row>
@@ -68,8 +70,10 @@ export default {
       // User's current location
       location: null,
 
-      // User's input
+      // User's interaction
       user_input: null,
+      region_onClick: null,
+      region_onHover: null,
 
       // Suburbs
       regions: [],
@@ -90,6 +94,17 @@ export default {
       },
       infoWindowPos: null,
       infoWinOpen: false,
+
+      // Polygons
+      polygon_options: {
+        visible: true,
+        strokeColor:"#FF5722",
+        strokeOpacity:0.8,
+        strokeWeight:2,
+        fillColor:"#FF5722",
+        fillOpacity:0
+      },
+      extra_options: {},
 
       // Marker
       markers: [{
@@ -129,17 +144,32 @@ export default {
     toggleInfoWindow(region) {
       this.infoWindowPos = region.region_center;
       this.infoWinOpen = true
+      this.region_onClick = region.name;
+    },
+
+    togglePolygon(r, flag) {
+      if (flag === true) {
+        this.$set(this.extra_options, r.name, {
+          fillOpacity: 0.4,
+        })
+      }
+      else {
+        this.$delete(this.extra_options, r.name)
+      }
     },
 
     queryLocation() {
       // Todo: User Input Regularization. Default is splitting by ' '. But Box Hill...?
       // names is an arrays
+      this.infoWinOpen = false
+      this.regions = []
       const names = this.user_input.split(' ')
       try {
         getPolygonsByNames(names).then(res => this.regions = res)
-      }catch (err) {
+      } catch (err) {
         console.log(err)
       }
+      this.polygon_options.visible = true
     },
   },
 

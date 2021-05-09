@@ -64,7 +64,7 @@ export async function getPolygonsByNames(names) {
         }
     })
 
-    return regions
+    return Object.freeze(regions)
 
 }
 
@@ -76,14 +76,14 @@ export function getAllPolygons() {
         const region_polygon = coordinates.map(item => ({lng: item[0], lat: item[1]}))
         const lat = coordinates.map(item => item[1])
         const lng = coordinates.map(item => item[0])
-        regions.push(Object.freeze({
+        regions.push({
             name: obj["properties"]["name"],
             region_center: {
                 lat: (Math.max(...lat) + Math.min(...lat)) / 2,
                 lng: (Math.max(...lng) + Math.min(...lng)) / 2,
             },
             path: region_polygon,
-        }))
+        })
     })
     return Object.freeze(regions)
 }
