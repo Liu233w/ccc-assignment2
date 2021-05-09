@@ -88,14 +88,10 @@ export default {
     }
   },
 
-  methods: {
-
-    // setChartTitle() {
-    //   const new_option = this.option
-    //   this.option.title.text = this.rename
-    //   this.option = new_option
-    // }
-
+  watch: {
+    rename(value) {
+      this.option.title.text = value
+    }
   }
 }
 </script>

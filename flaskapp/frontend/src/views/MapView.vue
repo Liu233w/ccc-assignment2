@@ -12,7 +12,7 @@
                     <template v-slot:input>
                       <v-text-field outlined
                                     background-color="#F5F5F5"
-                                    placeholder="Locations"
+                                    placeholder="Locations(Split by ',')"
                                     append-icon="mdi-map-marker"
                                     ref="input"
                                     v-model="user_input"
