@@ -20,7 +20,7 @@
     # just map all ports to server because I don't want to waste time on it anymore
     network_mode: host
     volumes:
-    - /home/couchdb/data:/mnt/data/couchdb
+    - /mnt/data/couchdb:/opt/couchdb/data
 
 - name: 'Setup systemd file'
   copy:

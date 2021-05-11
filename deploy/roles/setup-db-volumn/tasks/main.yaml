@@ -20,3 +20,4 @@
   file:
     path: /mnt/data/couchdb
     state: directory
+    mode: u=rwx,g=rwx,o=rwx
