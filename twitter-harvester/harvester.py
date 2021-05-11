@@ -39,7 +39,7 @@ def create_params():
         "tweet.fields": "author_id,created_at,geo,id,source,text",
         "place.fields": "full_name,geo,place_type",
         "user.fields": "location,username",
-        "max_results": 10
+        "max_results": 300
     }
 
     return params
@@ -86,8 +86,7 @@ def main():
     tweets = format_response(response)
 
     t1 = time()
-    for tweet in tweets:
-        couch["twitter"].save(tweet, batch='ok')
+    couch["twitter"].update(tweets)
     t2 = time()
     print("%.2fs to save" % (t2 - t1))
 
