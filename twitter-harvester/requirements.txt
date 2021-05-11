@@ -1,1 +1,3 @@
-tweepy
+redis
+couchdb
+requests
