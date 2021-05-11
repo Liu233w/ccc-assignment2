@@ -21,15 +21,12 @@ security_groups:
     port_range_min: 5984
     port_range_max: 5984
     remote_ip_prefix: 0.0.0.0/0
-
-couchdb_instance:
-  image: '9a689870-7c2b-4c74-a9a8-44f9ff587b43' # CentOS 8 x86_64
-  flavor: uom.general.2c8g
-  key_name: id-eresearch
-
-webservice_instance:
-  flavor: uom.general.2c8g
-  key_name: id-eresearch
+  - name: redis
+    description: "Security group for Redis"
+    protocol: tcp
+    port_range_min: 6379
+    port_range_max: 6379
+    remote_ip_prefix: 0.0.0.0/0
 
 instances:
   - name: db-1
@@ -50,6 +47,14 @@ instances:
     - ssh
     - couchdb
     flavor: uom.mse.2c9g
+  - name: webservice
+    security_groups:
+    - default
+    - ssh
+    - http
+    - redis
+    # flavor: m3.small  # seems like that this kind of instance does not have enough capacity
+    flavor: uom.mse.1c4g
 
 instance_image: '9a689870-7c2b-4c74-a9a8-44f9ff587b43' # CentOS 8 x86_64
 instance_key_name: 'My key' # Specify your key name here

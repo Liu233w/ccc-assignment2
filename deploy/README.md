@@ -7,6 +7,7 @@ Ansible playbook to deploy the project
 - Install ansible dependencies by `ansible-galaxy install -r requirements.yml`
 - Create a key-pair in MRC and set your key name in `host_vars/openstack.yaml` (`instance_key_name`)
 - Run your `openrc.sh` downloaded from MRC and input your password
+  - Please use the command like `. you-script.sh` to import the correct environment variable.
 - Run `ansible-playbook openstack.yaml` to create instances and volumns
 
 # To deploy application
