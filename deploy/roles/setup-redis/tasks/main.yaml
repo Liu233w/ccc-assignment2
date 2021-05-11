@@ -1,0 +1,11 @@
+---
+
+- name: Setup redis container
+  docker_container:
+    name: redis
+    image: redis
+    state: started
+    # recreate: yes
+    restart_policy: unless-stopped
+    published_ports:
+    - 6379:6379

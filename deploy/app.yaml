@@ -1,6 +1,7 @@
 ---
 
-- hosts:
+- name: Basic setup
+  hosts:
   - db_head
   - db_workers
   - webservices
@@ -16,7 +17,8 @@
   - common
   - setup-docker
 
-- hosts:
+- name: Setup couchDB
+  hosts:
   - db_head
   - db_workers
 
@@ -28,6 +30,21 @@
   become: true
 
   roles:
-  - setup-db-volumn
-  - setup-couchdb
-  - setup-couchdb-head
+  - name: setup-db-volumn
+    tags: ['couchdb']
+  - name: setup-couchdb
+    tags: ['couchdb']
+  - name: setup-couchdb-head
+    tags: ['couchdb']
+
+- name: Setup redis
+  hosts:
+  - webservices
+
+  gather_facts: true
+  remote_user: ec2-user
+  become: true
+
+  roles:
+  - name: setup-redis
+    tags: ['redis']
