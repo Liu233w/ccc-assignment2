@@ -19,7 +19,7 @@ The `GetTweetPrediction` script classifies the tweet_text into the defined 10 cl
 IF the prediction probability of the predicted class is less than the `threshold` value, it classifies the tweet as `OTHER` class.
 
 
-- The link to the BERT Classification Model: https://drive.google.com/drive/folders/1AJ85PaV6kTHsdB14ljZsy_uRIM3KncK_
+- The link to the BERT Classification Model: `https://drive.google.com/drive/folders/1AJ85PaV6kTHsdB14ljZsy_uRIM3KncK_`
 
 ## Classes
  - entertainment
