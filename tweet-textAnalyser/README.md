@@ -1,5 +1,7 @@
 ## The `predict_tweets.py` script is an example for predicting one tweet at a time
 
+The scripts in this repository use Python3
+Install the python packages of `requirements.txt` using `pip install -r requirements.txt` command.
 
 The Steps to Classify a tweet defined on the `predict_tweets.py` script are as follows:
  - Import the `GetTweetPrediction.py` script
