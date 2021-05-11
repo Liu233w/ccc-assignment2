@@ -17,11 +17,12 @@
 import GetTweetPrediction
 import time
 from transformers import BertForSequenceClassification, BertConfig, AdamW, BertTokenizer, logging
+from transformers import DistilBertForSequenceClassification, DistilBertConfig, AdamW, DistilBertTokenizer, logging
 import torch
 
 # Define Data
 tweet_text = "@LOLTrish hey  long time no see! Yes.. Rains a bit ,only a bit  LOL , I'm fine thanks , how's you ?"
-bert_classification_model_path = '/Users/vihangajayalath/Desktop/UniMelb/Semester 4/Cluster and Cloud Computing/Assignment2/BERT_Classifier/BERT_classification_epoch_1.model'
+bert_classification_model_path = '/home/keshawa/Desktop/CCC/Data/BERT_classification_epoch_1.model'
 threshold = 0.55
 
 def Load_Model(bert_classification_model_path):

@@ -58,7 +58,7 @@ class Get_Prediction:
         with torch.no_grad():        
             outputs = self.model(**inputs)
 
-        logits = outputs['logits']
+        logits = outputs[0]
         logits = logits.detach().cpu().numpy()
         softmax_prediction = self.Predict_Tweet(logits, 1, self.class_list, self.threshold)
 
