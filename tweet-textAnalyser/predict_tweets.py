@@ -48,29 +48,9 @@ model, tokenizer = Load_Model(bert_classification_model_path)
 end_time = time.time()
 print("Loading Time: %.2f" % (end_time - start_time))
 
-
-couchdb = CouchDB('admin', 'uJNh4NwrEt59o7', url='http://172.26.129.48:5984/', connect=True, auto_renew=True)
-
-tweets = True
-while (tweets):
-    tweets = couchdb["twitter"].get_query_result(
-        selector={
-            "_id": {
-                "$gt": None
-            },
-            "category": {
-                "$exists": False
-            }
-        },
-        limit=100).all()
-
-    # Predict
-    for tweet in tweets:
-        start_time = time.time()
-        prediction = GetTweetPrediction.Get_Prediction(
-            tweet["text"], model, tokenizer, threshold).Get_Tweet_Prediction()
-        doc = couchdb["twitter"][tweet["_id"]]
-        doc["category"] = prediction
-        doc.save()
-        end_time = time.time()
-        print("Execution Time: %.2f\tPrediction: %s" % (end_time - start_time, prediction))
+# Predict
+start_time = time.time()
+prediction = GetTweetPrediction.Get_Prediction(
+    tweet_text, model, tokenizer, threshold).Get_Tweet_Prediction()
+end_time = time.time()
+print("Execution Time: %.2f\tPrediction: %s" % (end_time - start_time, prediction))

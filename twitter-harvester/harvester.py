@@ -6,6 +6,7 @@ from redis import Redis
 import math
 import api
 from locations import get_features
+from predictor import Predictor, load_model
 
 
 def create_params(bounding_box, next_token):
@@ -74,17 +75,29 @@ def format_response(response):
 
 
 def main():
-    couchdb = CouchDB('admin', 'uJNh4NwrEt59o7', url='http://172.26.129.48:5984/', connect=True, auto_renew=True)
-    redis = Redis('172.26.134.58', 6379, 0)
-    features = get_features(os.environ['MAP_PATH'])
+    couchdb = CouchDB(
+        user=os.environ["COUCHDB_USERNAME"],
+        auth_token=os.environ["COUCHDB_PASSWORD"],
+        url='http://%s:5984/' % os.environ["COUCHDB_HOST"],
+        connect=True,
+        auto_renew=True)
+    redis = Redis(os.environ["REDIS_HOST"], 6379, 0)
+    features = get_features(os.environ["MAP_PATH"])
+    bert_classification_model_path = os.environ["MODEL_PATH"]
+
+    # Load classifier
+    start_time = time()
+    model, tokenizer = load_model(bert_classification_model_path)
+    end_time = time()
+    print("Loading Time: %.2fs" % (end_time - start_time))
 
     for feature in features:
-
         response = {"meta": {"next_token": None}}
         page = 0
         while "next_token" in response["meta"] and page < 10:
             page += 1
 
+            # Get tweets from Twitter
             gt1 = time()
             response = api.get(
                 endpoint='2/tweets/search/all',
@@ -102,12 +115,22 @@ def main():
 
             tweets = format_response(response)
 
+            # Add category prediction
+            pt1 = time()
+            for tweet in tweets:
+                predictor = Predictor(tweet["text"], model, tokenizer, threshold=0.55)
+                prediction = predictor.get_tweet_prediction()
+                tweet["category"] = prediction
+            pt2 = time()
+            print("%.2fs to predict" % (pt2 - pt1))
+
+            # Save to CouchDB
             t1 = time()
             couchdb["twitter"].bulk_docs(tweets)
             t2 = time()
             print("%.2fs to save" % (t2 - t1))
 
-            sleep(1)
+            sleep(1 - max(0, gt2 - t2))
 
 
 if __name__ == "__main__":
