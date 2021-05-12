@@ -1,12 +1,19 @@
 import os
 from time import sleep, time
-from datetime import datetime
+from datetime import datetime, timedelta
 from cloudant.client import CouchDB
 from redis import Redis
 import math
 import api
 from locations import get_features
 from predictor import Predictor, load_model
+
+os.environ["COUCHDB_USERNAME"] = "admin"
+os.environ["COUCHDB_PASSWORD"] = "uJNh4NwrEt59o7"
+os.environ["COUCHDB_HOST"] = "172.26.129.48"
+os.environ["REDIS_HOST"] = "172.26.134.58"
+os.environ["MAP_PATH"] = "/Users/robertsloan/repos/ccc-assignment2/flaskapp/frontend/src/assets/jsonfile/polygons.json"
+os.environ["MODEL_PATH"] = "/Users/robertsloan/Desktop/BERT_classification_epoch_1.model"
 
 
 def create_params(bounding_box, next_token):
@@ -33,15 +40,15 @@ def create_params(bounding_box, next_token):
         ), bounding_boxes))
 
     params = {
-        # "start_time": "",
-        # "end_time": "",
+        "start_time": "2007-01-01T00:00:00Z",
+        "end_time": (datetime.utcnow() - timedelta(seconds=30)).strftime('%Y-%m-%dT%H:%M:%SZ'),
         "query": "lang:EN -place:melbourne %s" % bounding_box_query,  # max 1,024 characters
         "user.fields": "url",
         "expansions": "geo.place_id,author_id",
         "tweet.fields": "author_id,created_at,geo,id,source,text",
         "place.fields": "full_name,geo,place_type",
         "user.fields": "location,username",
-        "max_results": 500
+        "max_results": 10
     }
 
     if next_token:
@@ -66,10 +73,13 @@ def format_response(response):
         # date_string = datetime.fromisoformat(tweet["created_at"][:-1]).strftime("%Y-%m-%d")
         id = tweet["id"]
         tweet["_id"] = "%s:%s" % (1, id)
-        if "author_id" in tweet:
-            tweet["author"] = users[tweet["author_id"]]
-        if "place_id" in tweet["geo"] and "coordinates" not in tweet["geo"]:
-            tweet["geo"]["place"] = places[tweet["geo"]["place_id"]]
+        try:
+            if "author_id" in tweet:
+                tweet["author"] = users[tweet["author_id"]]
+            if "place_id" in tweet["geo"] and "coordinates" not in tweet["geo"]:
+                tweet["geo"]["place"] = places[tweet["geo"]["place_id"]]
+        except Exception as e:
+            print('Error:', e, 'Tweet:', tweet)
 
     return tweets
 
@@ -82,7 +92,7 @@ def main():
         connect=True,
         auto_renew=True)
     redis = Redis(os.environ["REDIS_HOST"], 6379, 0)
-    features = get_features(os.environ["MAP_PATH"])
+    features = get_features(os.environ["MAP_PATH"])[10:]
     bert_classification_model_path = os.environ["MODEL_PATH"]
 
     # Load classifier
@@ -95,15 +105,22 @@ def main():
         response = {"meta": {"next_token": None}}
         page = 0
         while "next_token" in response["meta"] and page < 10:
+            next_token = response["meta"]["next_token"]
+            print('Getting tweets with token: %s...' % next_token)
             page += 1
 
             # Get tweets from Twitter
             gt1 = time()
-            response = api.get(
-                endpoint='2/tweets/search/all',
-                params=create_params(feature["box"], response["meta"]["next_token"]),
-                couchdb=couchdb,
-                redis=redis)
+            try:
+                response = api.get(
+                    endpoint='2/tweets/search/all',
+                    params=create_params(feature["box"], next_token),
+                    couchdb=couchdb,
+                    redis=redis)
+            except Exception as e:
+                print(e)
+                sleep(1)
+                continue
             gt2 = time()
             print("%.2fs to get %s tweets in %s" % (
                 gt2 - gt1,
