@@ -1,14 +1,14 @@
-from time import time
+import os
+from time import sleep, time
 from datetime import datetime
 from cloudant.client import CouchDB
 from redis import Redis
 import math
 import api
+from locations import get_features
 
 
-def create_params():
-    # Twitter's bounding box for Melbourne - might need to update
-    bounding_box = [144.593741856, -38.433859306, 145.512528832, -37.5112737225]
+def create_params(bounding_box, next_token):
     x_delta = bounding_box[2] - bounding_box[0]
     y_delta = bounding_box[3] - bounding_box[1]
     x_total = math.ceil(x_delta / 0.3)
@@ -40,8 +40,11 @@ def create_params():
         "tweet.fields": "author_id,created_at,geo,id,source,text",
         "place.fields": "full_name,geo,place_type",
         "user.fields": "location,username",
-        "max_results": 300
+        "max_results": 500
     }
+
+    if next_token:
+        params["next_token"] = next_token
 
     return params
 
@@ -59,9 +62,9 @@ def format_response(response):
 
     for tweet in tweets:
         # Partition by date
-        date_string = datetime.fromisoformat(tweet["created_at"][:-1]).strftime("%Y-%m-%d")
+        # date_string = datetime.fromisoformat(tweet["created_at"][:-1]).strftime("%Y-%m-%d")
         id = tweet["id"]
-        tweet["_id"] = "%s:%s" % (date_string, id)
+        tweet["_id"] = "%s:%s" % (1, id)
         if "author_id" in tweet:
             tweet["author"] = users[tweet["author_id"]]
         if "place_id" in tweet["geo"] and "coordinates" not in tweet["geo"]:
@@ -73,26 +76,38 @@ def format_response(response):
 def main():
     couchdb = CouchDB('admin', 'uJNh4NwrEt59o7', url='http://172.26.129.48:5984/', connect=True, auto_renew=True)
     redis = Redis('172.26.134.58', 6379, 0)
+    features = get_features(os.environ['MAP_PATH'])
 
-    t1 = time()
-    response = api.get(
-        endpoint='2/tweets/search/all',
-        params=create_params(),
-        couchdb=couchdb,
-        redis=redis)
-    t2 = time()
-    print("%.2fs to call" % (t2 - t1))
+    for feature in features:
 
-    if "data" not in response:
-        # handle
-        pass
+        response = {"meta": {"next_token": None}}
+        page = 0
+        while "next_token" in response["meta"] and page < 10:
+            page += 1
 
-    tweets = format_response(response)
+            gt1 = time()
+            response = api.get(
+                endpoint='2/tweets/search/all',
+                params=create_params(feature["box"], response["meta"]["next_token"]),
+                couchdb=couchdb,
+                redis=redis)
+            gt2 = time()
+            print("%.2fs to get %s tweets in %s" % (
+                gt2 - gt1,
+                len(response["data"]) if "data" in response else 0,
+                feature["name"]))
 
-    t1 = time()
-    couchdb["twitter"].bulk_docs(tweets)
-    t2 = time()
-    print("%.2fs to save" % (t2 - t1))
+            if "data" not in response or len(response["data"]) == 0:
+                continue
+
+            tweets = format_response(response)
+
+            t1 = time()
+            couchdb["twitter"].bulk_docs(tweets)
+            t2 = time()
+            print("%.2fs to save" % (t2 - t1))
+
+            sleep(1)
 
 
 if __name__ == "__main__":
