@@ -1,5 +1,5 @@
 import requests
-import couchdb
+from cloudant.client import CouchDB
 from urllib.parse import urlencode, urlunparse
 from collections import namedtuple
 from redis import Redis
@@ -10,20 +10,18 @@ TwitterUrl = namedtuple(
     defaults=['https', 'api.twitter.com', '', '', '', ''])
 
 
-def auth(couch: couchdb.Server, redis: Redis):
+def auth(couchdb: CouchDB, redis: Redis):
     token = redis.get('token')
     if token:
         token = token.decode('utf-8')
     if not token:
-        tokens = couch["tokens"].find({
-            "selector": {
+        token = couchdb["tokens"].get_query_result(
+            selector={
                 "_id": {
                     "$gt": None
-                }
+                },
             },
-            "limit": 1
-        })
-        token = list(tokens)[0]["token"]
+            limit=1).all()[0]["token"]
         redis.set('token', token, 86400)
 
     return token
@@ -48,8 +46,8 @@ def connect_to_endpoint(url, headers):
     return response.json()
 
 
-def get(endpoint, params, couch, redis):
-    bearer_token = auth(couch, redis)
+def get(endpoint, params, couchdb, redis):
+    bearer_token = auth(couchdb, redis)
     url = create_url(endpoint, params)
     headers = create_headers(bearer_token)
     json_response = connect_to_endpoint(url, headers)

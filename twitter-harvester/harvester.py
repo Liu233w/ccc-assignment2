@@ -1,5 +1,6 @@
 from time import time
-import couchdb
+from datetime import datetime
+from cloudant.client import CouchDB
 from redis import Redis
 import math
 import api
@@ -57,7 +58,10 @@ def format_response(response):
             users = {x["id"]: x for x in response["includes"]["users"]}
 
     for tweet in tweets:
-        tweet["_id"] = tweet["id"]
+        # Partition by date
+        date_string = datetime.fromisoformat(tweet["created_at"][:-1]).strftime("%Y-%m-%d")
+        id = tweet["id"]
+        tweet["_id"] = "%s:%s" % (date_string, id)
         if "author_id" in tweet:
             tweet["author"] = users[tweet["author_id"]]
         if "place_id" in tweet["geo"] and "coordinates" not in tweet["geo"]:
@@ -67,14 +71,14 @@ def format_response(response):
 
 
 def main():
-    couch = couchdb.Server('http://admin:uJNh4NwrEt59o7@172.26.129.48:5984/')  # should come from os.environ param
+    couchdb = CouchDB('admin', 'uJNh4NwrEt59o7', url='http://172.26.129.48:5984/', connect=True, auto_renew=True)
     redis = Redis('172.26.134.58', 6379, 0)
 
     t1 = time()
     response = api.get(
         endpoint='2/tweets/search/all',
         params=create_params(),
-        couch=couch,
+        couchdb=couchdb,
         redis=redis)
     t2 = time()
     print("%.2fs to call" % (t2 - t1))
@@ -86,7 +90,7 @@ def main():
     tweets = format_response(response)
 
     t1 = time()
-    couch["twitter"].update(tweets)
+    couchdb["twitter"].bulk_docs(tweets)
     t2 = time()
     print("%.2fs to save" % (t2 - t1))
 
