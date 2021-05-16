@@ -6,6 +6,7 @@ import vuetify from './plugins/vuetify'
 import ECharts from 'vue-echarts'
 import { use } from 'echarts/core'
 import * as GmapVue from 'gmap-vue'
+import axios from 'axios'
 
 Vue.config.productionTip = false
 
@@ -47,6 +48,12 @@ Vue.use(GmapVue, {
   },
   installComponents: true
 })
+
+// add axios
+const axiosInstance = axios.create({
+  baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:9797' : '/'
+})
+Vue.prototype.$axios = axiosInstance
 
 new Vue({
   router,

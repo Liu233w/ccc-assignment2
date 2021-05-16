@@ -175,6 +175,7 @@ export default {
 
   created() {
     this.regions = getAllPolygons()
+    this.$store.dispatch('categories/refresh')
   },
 
   mounted() {

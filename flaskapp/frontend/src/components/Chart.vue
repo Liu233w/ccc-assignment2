@@ -1,5 +1,6 @@
 <template>
-  <v-chart class="chart" :option="option"/>
+  <p v-if="!loaded">No data</p>
+  <v-chart v-else class="chart" :option="option"/>
 </template>
 
 <script>
@@ -15,6 +16,7 @@ export default {
 
   data() {
     return {
+      loaded: false,
 
       option: {
         dataset: {
@@ -90,7 +92,23 @@ export default {
 
   watch: {
     rename(value) {
+      this.loaded = false
+
       this.option.title.text = value
+      
+      const suburb = this.$store.getters['categories/suburb'][value.toUpperCase()]
+      console.log('suburb', value, suburb)
+      if (!suburb) {
+        return
+      }
+
+      const res = []
+      for (const category in suburb) {
+        const value = suburb[category]
+        res.push({value, name: category})
+      }
+      this.$set(this.option.dataset, 'source', res)
+      this.loaded = true
     }
   }
 }

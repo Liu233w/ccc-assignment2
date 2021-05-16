@@ -25,7 +25,7 @@ const actions = {
 }
 
 const getters = {
-    getToken(){
+    getToken(state){
         return state.token
     }
 }
