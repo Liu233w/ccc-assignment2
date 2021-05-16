@@ -4,6 +4,7 @@
     name: backend
     image: '{{backend.image}}'
     state: started
+    pull: true # always use the latest image
     # recreate: yes
     restart_policy: unless-stopped
     published_ports:
