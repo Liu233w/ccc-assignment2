@@ -73,9 +73,6 @@ export default {
 
   data() {
     return {
-      // User's current location
-      location: null,
-
       // User's interaction
       user_input: null,
       region_onClick: null,
@@ -128,26 +125,6 @@ export default {
   },
 
   methods: {
-    getCurrentLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            this.location = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            this.infoWinOpen = true;
-          },
-          () => {
-            alert("Error: The Geolocation service failed.");
-          }
-        );
-      } else {
-        // Browser doesn't support Geolocation
-        alert("Error: Your browser doesn't support geolocation.");
-      }
-    },
-
     toggleInfoWindow(region) {
       this.infoWindowPos = region.region_center;
       this.infoWinOpen = true;
