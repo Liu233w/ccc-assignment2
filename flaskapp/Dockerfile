@@ -5,13 +5,18 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
 
 COPY frontend/ /app/frontend/
-COPY backend/ /app/backend/
+RUN mkdir -p /app/backend/dist
 RUN npm run build
 
 FROM python:3.7-slim as final
 WORKDIR /app
-COPY --from=build /app/backend/ .
+
+COPY backend/requirements.txt .
 RUN pip install -r requirements.txt
+
+COPY backend/ .
+COPY --from=build /app/backend/ .
+
 EXPOSE 9797
 ENV COUCHDB_URL ''
 
