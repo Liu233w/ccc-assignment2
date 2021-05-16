@@ -6,7 +6,13 @@ export default {
   input: 'src/view.js',
   output: {
     dir: 'dest',
-    format: 'cjs'
+    format: 'iife'
   },
-  plugins: [resolve(), commonjs(), json({compact: true})],
+  plugins: [
+    resolve({
+      mainFields: ['browser', 'module', 'main'],
+    }), 
+    commonjs(), 
+    json({compact: true})
+  ],
 };
