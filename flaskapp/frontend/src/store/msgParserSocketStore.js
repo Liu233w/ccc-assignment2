@@ -2,8 +2,8 @@ import Socket from 'socket.io-client'
 
 // initial state
 const state = {
-    urlAddress: `http://${location.hostname}:9797`,
-    msgParserSocket: Socket(`${location.hostname}:9797/msg-parser`),
+    urlAddress: `http://${location.hostname}:${location.port}`,
+    msgParserSocket: Socket(`${location.hostname}:${location.port}/msg-parser`),
     socketConnectedFlag: false
 }
 
