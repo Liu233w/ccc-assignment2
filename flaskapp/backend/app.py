@@ -53,7 +53,7 @@ def _main():
     CORS(app)
 
     # creates the Socket.IO socket instance
-    socket_io = SocketIO(app)
+    socket_io = SocketIO(app, cors_allowed_origins="*")
     socketio_server = {'msg-parser': MsgParserSocketIOServer(
         socketio=socket_io, namespace='/msg-parser', application_path=application_path)}
 
