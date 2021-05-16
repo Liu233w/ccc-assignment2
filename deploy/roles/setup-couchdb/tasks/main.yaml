@@ -6,6 +6,12 @@
     head_node_ip: '{{groups.db_head[0]}}'
     node_count: "{{groups['db_workers'] | length + 1}}"
 
+- name: Copy config file
+  copy:
+    src: config.ini
+    dest: /opt/couchdb-config.ini
+    mode: u=rw,g=r,o=r
+
 - name: Create CouchDB container
   docker_container:
     name: couchdb
@@ -21,6 +27,7 @@
     network_mode: host
     volumes:
     - /mnt/data/couchdb:/opt/couchdb/data
+    - /opt/couchdb-config.ini:/opt/couchdb/etc/local.d/config.ini
 
 - name: 'Setup systemd file'
   copy:
