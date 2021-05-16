@@ -107,17 +107,21 @@ def put_view(id):
   """
 
   doc = twitter.get('_design/'+id)
-  rev = doc['_rev']
+  if doc:
+    rev = doc['_rev']
+  else:
+    rev = None
 
   view = request.get_json()
 
   doc = {
     '_id': '_design/'+id,
-    '_rev': rev,
     'views': {'all': view},
     "language": "javascript",
     "options": {"partitioned": False },
   }
+  if rev:
+    doc['_rev'] = rev
 
   twitter.save(doc)
   return jsonify({

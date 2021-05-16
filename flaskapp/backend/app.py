@@ -40,7 +40,7 @@ def _main():
         return jsonify({
             'error': True,
             'message': type(e).__name__ + ': ' + str(e),
-        })
+        }), 500
 
     app.config['SWAGGER'] = {
         'title': 'API of CCC Assignment 2',
