@@ -48,3 +48,18 @@
   roles:
   - name: setup-redis
     tags: ['redis']
+
+- name: Setup application
+  hosts:
+  - webservices
+
+  vars_files:
+  - host_vars/app.yaml
+
+  gather_facts: true
+  remote_user: ec2-user
+  become: true
+
+  roles:
+  - name: setup-backend
+    tags: ['app']

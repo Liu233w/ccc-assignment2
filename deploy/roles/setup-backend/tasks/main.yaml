@@ -1,0 +1,12 @@
+---
+- name: Deploy backend
+  docker_container:
+    name: backend
+    image: '{{backend.image}}'
+    state: started
+    # recreate: yes
+    restart_policy: unless-stopped
+    published_ports:
+    - 80:9797
+    env:
+      COUCHDB_URL: 'http://{{couchdb.user}}:{{couchdb.pwd}}@{{groups.db_head[0]}}:5984'
