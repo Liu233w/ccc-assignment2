@@ -39,7 +39,8 @@
             @closeclick="infoWinOpen=false"
             class="info-window"
           >
-            <Chart :rename="this.region_onClick" />
+            <p v-if="loading">Loading...</p>
+            <Chart v-else :rename="this.region_onClick" />
           </GmapInfoWindow>
 
           <GmapPolygon
@@ -115,6 +116,9 @@ export default {
           position: this.center,
         },
       ],
+
+      // Loading data
+      loading: true,
     };
   },
 
@@ -157,14 +161,14 @@ export default {
     },
   },
 
-  created() {
+  async created() {
     this.regions = getAllPolygons();
     // console.log(getAllPolygons())
-    this.$store.dispatch("categories/refresh");
+    await this.$store.dispatch("categories/refresh");
+    this.loading = false
   },
 
   mounted() {
-    this.getCurrentLocation();
     // this.setInfoWindowContent()
   },
 };

@@ -98,7 +98,7 @@ export default {
       
       const suburb = this.$store.getters['categories/suburb'][value.toUpperCase()]
       console.log('suburb', value, suburb)
-      if (!suburb) {
+      if (!suburb || suburb.length <= 0) {
         return
       }
 
