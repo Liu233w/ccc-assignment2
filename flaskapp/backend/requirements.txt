@@ -13,3 +13,4 @@ Werkzeug==1.0.1
 couchdb
 python-dotenv
 flasgger
+flask-cors
