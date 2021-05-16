@@ -32,7 +32,8 @@
 //     console.log(data["features"][0]["properties"]["name"])
 // })
 
-import * as data from '../assets/jsonfile/polygons.json'
+import data from '../assets/jsonfile/polygons.json'
+data.features = data.features.filter(f => f.geometry)
 
 export async function getPolygonsByNames(names) {
 
@@ -44,36 +45,37 @@ export async function getPolygonsByNames(names) {
         // TODO: names may be illegal
         if (region === undefined) {
             // do something...
-            throw "Region name is not correct"
-        } else {
-            const coordinates = region["geometry"]["coordinates"][0][0]
-            // const arr_length = coordinates.length
-            const region_polygon = coordinates.map(item => ({lng: item[0], lat: item[1]}))
-            const lat = coordinates.map(item => item[1])
-            const lng = coordinates.map(item => item[0])
-            regions.push(
-                {
-                    name: names[index],
-                    region_center: {
-                        lat: (Math.max(...lat) + Math.min(...lat)) / 2,
-                        lng: (Math.max(...lng) + Math.min(...lng)) / 2,
-                    },
-                    path: region_polygon
-                }
-            )
+            console.log("Region name is not correct", value)
+            return
         }
+
+        const coordinates = region["geometry"]["coordinates"][0]
+        // const arr_length = coordinates.length
+        const region_polygon = coordinates.map(item => ({ lng: item[0], lat: item[1] }))
+        const lat = coordinates.map(item => item[1])
+        const lng = coordinates.map(item => item[0])
+        regions.push(
+            {
+                name: names[index],
+                region_center: {
+                    lat: (Math.max(...lat) + Math.min(...lat)) / 2,
+                    lng: (Math.max(...lng) + Math.min(...lng)) / 2,
+                },
+                path: region_polygon
+            }
+        )
     })
 
     return Object.freeze(regions)
-
 }
 
 export function getAllPolygons() {
+    // window._data = data
 
     let regions = []
     data["features"].forEach(obj => {
-        const coordinates = obj["geometry"]["coordinates"][0][0]
-        const region_polygon = coordinates.map(item => ({lng: item[0], lat: item[1]}))
+        const coordinates = obj["geometry"]["coordinates"][0]
+        const region_polygon = coordinates.map(item => ({ lng: item[0], lat: item[1] }))
         const lat = coordinates.map(item => item[1])
         const lng = coordinates.map(item => item[0])
         regions.push({
