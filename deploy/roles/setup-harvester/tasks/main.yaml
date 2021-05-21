@@ -25,11 +25,13 @@
     state: started
     # recreate: yes
     restart_policy: unless-stopped
-    network_mode: host
     env:
       COUCHDB_HOST: "{{groups.db_head[0]}}"
       COUCHDB_USERNAME: '{{couchdb.user}}'
       COUCHDB_PASSWORD: '{{couchdb.pwd}}'
       REDIS_HOST: "{{groups.webservices[0]}}"
+      HTTP_PROXY: http://wwwproxy.unimelb.edu.au:8000/
+      HTTPS_PROXY: http://wwwproxy.unimelb.edu.au:8000/
+      NO_PROXY: localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au
     volumes:
     - "{{harvester.model_path}}{{harvester.model_name}}:/opt/bert.model"
