@@ -9,6 +9,7 @@ def load_features(filepath, couchdb: CouchDB):
         couchdb.create_database("features", partitioned=False)
         couchdb["features"].create_query_index(fields=["newest"])
         couchdb["features"].create_query_index(fields=[{"oldest": "desc"}])
+
     poly_features = []
     with open(filepath) as file:
         content = file.read()

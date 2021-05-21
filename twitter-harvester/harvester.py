@@ -108,7 +108,7 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
     page = 0
     while "next_token" in response["meta"] and page < 10:
         next_token = response["meta"]["next_token"]
-        print('Getting tweets for %s, token: %s...' % (feature["name"], next_token))
+        print('Getting tweets for %s%s' % (feature["name"], ", next_token: %s..." % next_token))
         page += 1
 
         # Get tweets from Twitter
@@ -156,6 +156,7 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
 
 
 def main():
+    print("Connecting to services...")
     couchdb = CouchDB(
         user=os.environ["COUCHDB_USERNAME"],
         auth_token=os.environ["COUCHDB_PASSWORD"],
@@ -163,13 +164,18 @@ def main():
         connect=True,
         auto_renew=True)
     redis = Redis(os.environ["REDIS_HOST"], 6379, 0)
+
+    # Load features
+    print("Loading features...")
+    start_time = time()
     load_features(os.environ["MAP_PATH"], couchdb)
+    print("Loading Time: %.2fs" % (time() - start_time))
 
     # Load classifier
+    print("Loading classifier...")
     start_time = time()
     model, tokenizer = load_model(os.environ["MODEL_PATH"])
-    end_time = time()
-    print("Loading Time: %.2fs" % (end_time - start_time))
+    print("Loading Time: %.2fs" % (time() - start_time))
 
     while True:
         feature = couchdb["features"].get_query_result(
@@ -177,6 +183,7 @@ def main():
             sort=[{"newest": "asc"}],
             limit=1
         ).all()[0]
+        print("Calling for feature: %s..." % feature["_id"])
         call_for_feature(feature, model, tokenizer,
                          couchdb, redis, backfill=False)
 
@@ -185,6 +192,7 @@ def main():
             sort=[{"oldest": "desc"}],
             limit=1
         ).all()[0]
+        print("Calling backfill for feature: %s..." % feature["_id"])
         call_for_feature(feature_backfill, model, tokenizer,
                          couchdb, redis, backfill=True)
 
