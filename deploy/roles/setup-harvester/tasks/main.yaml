@@ -3,11 +3,19 @@
 - name: Ensure model folder exist
   file: path={{harvester.model_path}} state=directory
 
+- name: Install gdown
+  pip:
+    name: ['gdown']
+    state: latest
+
+- name: Check that the model file exists
+  stat:
+    path: "{{harvester.model_path}}{{harvester.name}}"
+  register: stat_result
+
 - name: Download model
-  get_url:
-    url: "{{harvester.model_url}}"
-    dest: "{{harvester.model_path}}{{harvester.name}}"
-    mode: u=r,g-r,o=r
+  shell: "gdown '{{harvester.model_url}}' -O '{{harvester.model_path}}{{harvester.name}}'"
+  when: not stat_result.stat.exists
 
 - name: Deploy harvester
   docker_container:
