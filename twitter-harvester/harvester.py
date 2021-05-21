@@ -106,7 +106,7 @@ def format_response(response, feature):
         tweet["feature"] = {
             "_id": feature["_id"],
             "name": feature["name"],
-            "loc_pid": feature["loc_pid"]
+            "loc_pid": feature["loc_pid"] if "loc_pid" in feature else None
         }
         try:
             if "author_id" in tweet:
