@@ -5,7 +5,7 @@ from cloudant.client import CouchDB
 from redis import Redis
 import math
 import api
-from locations import load_features
+from features import load_features
 from predictor import Predictor, load_model
 
 os.environ["COUCHDB_USERNAME"] = "admin"
@@ -51,7 +51,7 @@ def create_params(feature, next_token, start_time, end_time):
         "tweet.fields": "author_id,created_at,geo,id,source,text",
         "place.fields": "full_name,geo,place_type",
         "user.fields": "location,username",
-        "max_results": 10,
+        "max_results": 300,
     }
 
     if next_token:
@@ -65,15 +65,21 @@ def get_time_interval(feature, backfill) -> "tuple[datetime, datetime]":
     start_time = None
     end_time = None
     if not backfill:
-        start_time = datetime.fromtimestamp(feature["newest"])
+        if (feature["newest"] is None):
+            start_time = datetime.utcnow() - timedelta(days=30)
+        else:
+            start_time = datetime.fromtimestamp(feature["newest"])
         end_time = datetime.utcnow() - timedelta(seconds=30)
     else:
-        end_time = datetime.fromtimestamp(feature["oldest"])
-        start_time = end_time - timedelta(days=30)
+        if (feature["oldest"] is None):
+            end_time = datetime.utcnow() - timedelta(days=30)
+        else:
+            end_time = datetime.fromtimestamp(feature["oldest"])
+        start_time = end_time - timedelta(days=90)
 
     # Keep times within Twitter limits
-    if start_time < datetime(2017, 1, 1):
-        start_time = datetime(2017, 1, 1)
+    if start_time < datetime(2006, 4, 1):
+        start_time = datetime(2006, 4, 1)
 
     return start_time, end_time
 
@@ -100,10 +106,10 @@ def format_response(response):
             users = {x["id"]: x for x in response["includes"]["users"]}
 
     for tweet in tweets:
-        # Partition by date
-        # date_string = datetime.fromisoformat(tweet["created_at"][:-1]).strftime("%Y-%m-%d")
+        # Partition by year
+        partition_key = datetime.fromisoformat(tweet["created_at"][:-1]).strftime("%Y%m")
         id = tweet["id"]
-        tweet["_id"] = "%s:%s" % (1, id)
+        tweet["_id"] = "%s:%s" % (partition_key, id)
         try:
             if "author_id" in tweet:
                 tweet["author"] = users[tweet["author_id"]]
@@ -170,8 +176,6 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
         t2 = time()
         print("%.2fs to save" % (t2 - t1))
 
-        sleep(1 - max(0, gt2 - t2))
-
     # TODO: if page >= 10: save url for later
 
 
@@ -198,12 +202,13 @@ def main():
     print("Loading Time: %.2fs" % (time() - start_time))
 
     while True:
+        backfill = False
         result = couchdb["features"].get_query_result(
             selector={
                 "newest": {
                     "$or": [
                         {"$exists": False},
-                        {"$lt": int((datetime.utcnow() - timedelta(hours=1)).timestamp())}
+                        {"$lt": int((datetime.utcnow() - timedelta(days=1)).timestamp())}
                     ]
                 }
             },
@@ -211,33 +216,29 @@ def main():
             limit=1
         ).all()
         if len(result) == 0:
-            print('No outdated features...')
-            sleep(60)
-        else:
-            feature = result[0]
-            print("Calling for feature: %s..." % feature["_id"])
-            call_for_feature(feature, model, tokenizer,
-                             couchdb, redis, backfill=False)
+            backfill = True
+            result = couchdb["features"].get_query_result(
+                selector={"oldest": {"$exists": False}},
+                limit=1
+            ).all()
+            if len(result) == 0:
+                result = couchdb["features"].get_query_result(
+                    selector={"oldest": {"$gt": datetime(2006, 4, 1).timestamp()}},
+                    sort=[{"oldest": "desc"}],
+                    limit=1
+                ).all()
 
-        result = couchdb["features"].get_query_result(
-            selector={
-                "oldest": {
-                    "$or": [
-                        {"$exists": False},
-                        {"$gt": datetime(2017, 1, 1).timestamp()}
-                    ]
-                }
-            },
-            sort=[{"oldest": "desc"}],
-            limit=1
-        ).all()
         if len(result) == 0:
-            print('No missing backfill...')
-        else:
-            feature = result[0]
-            print("Calling backfill for feature: %s..." % feature["_id"])
-            call_for_feature(feature, model, tokenizer,
-                             couchdb, redis, backfill=False)
+            print('No jobs...')
+            sleep(3600)
+            continue
+
+        feature = result[0]
+        print("Calling %sfor feature: %s..." % (
+            "backfill " if backfill else "",
+            feature["_id"]))
+        call_for_feature(feature, model, tokenizer,
+                         couchdb, redis, backfill)
 
 
 if __name__ == "__main__":

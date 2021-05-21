@@ -50,13 +50,12 @@ def load_features(filepath, couchdb: CouchDB):
     known_ids = list(map(lambda doc: doc["_id"], docs))
     new_features = list(filter(lambda feature: feature["id"] not in known_ids, features))
 
-    timestamp = int(datetime.utcnow().timestamp())
     new_docs = list(map(lambda feature: {
         "_id": feature["id"],
         "box": feature["box"],
         "name": feature["name"],
-        "newest": timestamp,
-        "oldest": timestamp
+        "newest": None,
+        "oldest": None
     }, new_features))
     couchdb["features"].bulk_docs(new_docs)
 
