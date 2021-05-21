@@ -5,24 +5,24 @@
         <!-- <router-link to="/">Home</router-link> -->
         <h1>Connected: {{ getConnectionStatus }}</h1>
       </div>
-      <!-- <v-row dense>
+      <v-row dense>
         <v-col cols="12" md="6">
           <h1>{{ getCourse }}</h1>
           <h2>{{ getTitle }}</h2>
           <p>{{ getMembers }}</p>
           <p>{{ getDescription }}</p>
-          <v-btn @click="postRequestToBackendHandler()">
+          <!-- <v-btn @click="postRequestToBackendHandler()">
             Post To Backend
           </v-btn>
-          <p>Post Request Response: {{ postRequestResponse }}</p>
+          <p>Post Request Response: {{ postRequestResponse }}</p> -->
         </v-col>
-        <v-col>
+        <!-- <v-col>
           <v-btn @click="getRequestToBackendHandler()">
             Get Request from Backend
           </v-btn>
           <p>Get Request Response: {{ getRequestResponse }}</p>
-        </v-col>
-      </v-row> -->
+        </v-col> -->
+      </v-row>
       <v-btn
           rounded
           color="primary"
