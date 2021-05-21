@@ -8,13 +8,6 @@ import api
 from features import load_features
 from predictor import Predictor, load_model
 
-os.environ["COUCHDB_USERNAME"] = "admin"
-os.environ["COUCHDB_PASSWORD"] = "uJNh4NwrEt59o7"
-os.environ["COUCHDB_HOST"] = "172.26.129.48"
-os.environ["REDIS_HOST"] = "172.26.134.58"
-os.environ["MAP_PATH"] = "/Users/robertsloan/repos/ccc-assignment2/flaskapp/frontend/src/assets/jsonfile/polygons.json"
-os.environ["MODEL_PATH"] = "/Users/robertsloan/Desktop/BERT_classification_epoch_1.model"
-
 
 def create_params(feature, next_token, start_time, end_time):
 
@@ -43,8 +36,8 @@ def create_params(feature, next_token, start_time, end_time):
         ), boxes))
 
     params = {
-        "start_time": start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
-        "end_time": end_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        "start_time": start_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "end_time": end_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "query": "lang:EN -place:melbourne %s" % box_query,  # max 1,024 characters
         "user.fields": "url",
         "expansions": "geo.place_id,author_id",
@@ -75,7 +68,7 @@ def get_time_interval(feature, backfill) -> "tuple[datetime, datetime]":
             end_time = datetime.utcnow() - timedelta(days=30)
         else:
             end_time = datetime.fromtimestamp(feature["oldest"])
-        start_time = end_time - timedelta(days=90)
+        start_time = end_time - timedelta(days=30)
 
     # Keep times within Twitter limits
     if start_time < datetime(2006, 4, 1):
@@ -116,7 +109,7 @@ def format_response(response):
             if "place_id" in tweet["geo"] and "coordinates" not in tweet["geo"]:
                 tweet["geo"]["place"] = places[tweet["geo"]["place_id"]]
         except Exception as e:
-            print('Error:', e, 'Tweet:', tweet)
+            print("Error:", e, "Tweet:", tweet)
 
     return tweets
 
@@ -128,18 +121,18 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
     page = 0
     while "next_token" in response["meta"] and page < 10:
         next_token = response["meta"]["next_token"]
-        print('Getting tweets for %s between %s and %s%s' % (
+        print("Getting tweets for %s between %s and %s%s" % (
             feature["name"],
-            start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            end_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            ", next_token: %s..." % next_token))
+            start_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            end_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            ", next_token: %s..." % next_token if next_token else ""))
         page += 1
 
         # Get tweets from Twitter
         gt1 = time()
         try:
             response = api.get(
-                endpoint='2/tweets/search/all',
+                endpoint="2/tweets/search/all",
                 params=create_params(feature, next_token, start_time, end_time),
                 couchdb=couchdb,
                 redis=redis)
@@ -184,7 +177,7 @@ def main():
     couchdb = CouchDB(
         user=os.environ["COUCHDB_USERNAME"],
         auth_token=os.environ["COUCHDB_PASSWORD"],
-        url='http://%s:5984/' % os.environ["COUCHDB_HOST"],
+        url="http://%s:5984/" % os.environ["COUCHDB_HOST"],
         connect=True,
         auto_renew=True)
     redis = Redis(os.environ["REDIS_HOST"], 6379, 0)
@@ -229,7 +222,7 @@ def main():
                 ).all()
 
         if len(result) == 0:
-            print('No jobs...')
+            print("No jobs...")
             sleep(3600)
             continue
 
