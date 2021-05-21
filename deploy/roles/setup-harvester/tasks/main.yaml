@@ -28,7 +28,7 @@
     network_mode: host
     env:
       COUCHDB_HOST: "{{groups.db_head[0]}}"
-      COUCHDB_USER: '{{couchdb.user}}'
+      COUCHDB_USERNAME: '{{couchdb.user}}'
       COUCHDB_PASSWORD: '{{couchdb.pwd}}'
       REDIS_HOST: "{{groups.webservices[0]}}"
     volumes:
