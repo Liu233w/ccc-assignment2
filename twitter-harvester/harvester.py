@@ -144,7 +144,7 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
         except Exception as e:
             print(e)
             sleep(1)
-            continue
+            break
         gt2 = time()
         print("%.2fs to get %s tweets from %s" % (
             gt2 - gt1,
@@ -216,7 +216,7 @@ def main():
         if len(result) == 0:
             backfill = True
             result = couchdb["features"].get_query_result(
-                selector={"oldest": {"$exists": False}},
+                selector={"oldest": {"$or": [{"$exists": False}, None]}},
                 limit=1
             ).all()
             if len(result) == 0:
