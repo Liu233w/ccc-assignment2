@@ -3,6 +3,8 @@ from cloudant.client import CouchDB
 from urllib.parse import urlencode, urlunparse
 from collections import namedtuple
 from redis import Redis
+from datetime import datetime, timedelta
+from time import sleep
 
 TwitterUrl = namedtuple(
     typename='TwitterUrl',
@@ -10,21 +12,59 @@ TwitterUrl = namedtuple(
     defaults=['https', 'api.twitter.com', '', '', '', ''])
 
 
-def auth(couchdb: CouchDB, redis: Redis):
-    token = redis.get('token')
-    if token:
-        token = token.decode('utf-8')
-    if not token:
-        token = couchdb["tokens"].get_query_result(
-            selector={
-                "_id": {
-                    "$gt": None
-                },
-            },
-            limit=1).all()[0]["token"]
-        redis.set('token', token, 86400)
+# TODO: avoid record deadlocks
+def auth(couchdb: CouchDB, redis: Redis, endpoint: str):
+    # Select valid token
+    now = datetime.utcnow().timestamp()
+    min_window = (datetime.utcnow() - timedelta(minutes=15)).timestamp()
+    token = None
 
-    return token
+    while not token:
+        result = couchdb["tokens"].get_query_result(
+            selector={
+                # ensure less than x calls per window
+                endpoint: {
+                    "$or": [
+                        {"$exists": False},
+                        {"total": {"$lt": 300}},
+                        {"since": {"$lt": min_window}}
+                    ]
+                },
+                # ensure less than one second per call
+                "last_used": {
+                    "$or": [
+                        {"$exists": False},
+                        {"$lt": now - 1}
+                    ]
+                }
+            },
+            limit=1).all()
+        if len(result) == 0:
+            print("No valid token, waiting...")
+            sleep(1)
+            continue
+        else:
+            token = result[0]
+    print("Using token: %s" % token["_id"])
+    doc = couchdb["tokens"][token["_id"]]
+
+    # Update last_used
+    doc["last_used"] = now
+
+    # Update window details
+    if endpoint not in doc or doc[endpoint]["since"] < min_window:
+        # Create window if non-existant or outdated
+        doc[endpoint] = {
+            "since": datetime.utcnow().timestamp(),
+            "total": 1
+        }
+    else:
+        # Update otherwise
+        doc[endpoint]["total"] += 1
+
+    doc.save()
+
+    return token["token"]
 
 
 def create_url(endpoint, params):
@@ -47,7 +87,7 @@ def connect_to_endpoint(url, headers):
 
 
 def get(endpoint, params, couchdb, redis):
-    bearer_token = auth(couchdb, redis)
+    bearer_token = auth(couchdb, redis, endpoint)
     url = create_url(endpoint, params)
     headers = create_headers(bearer_token)
     json_response = connect_to_endpoint(url, headers)
