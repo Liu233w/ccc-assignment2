@@ -1,3 +1,8 @@
 cloudant
 redis
 requests
+
+# for predictor
+numpy==1.19.5
+torch==1.8
+transformers==3.1.0
