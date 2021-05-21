@@ -6,3 +6,9 @@ couchdb:
 
 backend:
   image: liu233w/ccc-assignment2
+
+harvester:
+  image: liu233w/ccc-assignment2-harvester
+  model_path: /var/harvester/
+  model_name: bert.model
+  model_url: https://drive.google.com/uc?export=download&id=1H4L2LYaajnfc--r1NK7gtm9jLLynpaKk

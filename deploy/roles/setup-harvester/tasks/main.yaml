@@ -1,0 +1,26 @@
+---
+
+- name: Ensure model folder exist
+  file: path={{harvester.model_path}} state=directory
+
+- name: Download model
+  get_url:
+    url: "{{harvester.model_url}}"
+    dest: "{{harvester.model_path}}{{harvester.name}}"
+    mode: u=r,g-r,o=r
+
+- name: Deploy harvester
+  docker_container:
+    name: harvester
+    image: "{{harvester.image}}"
+    pull: true # always use the latest image
+    state: started
+    # recreate: yes
+    restart_policy: unless-stopped
+    env:
+      COUCHDB_HOST: "{{groups.db_head[0]}}"
+      COUCHDB_USER: '{{couchdb.user}}'
+      COUCHDB_PASSWORD: '{{couchdb.pwd}}'
+      REDIS_HOST: "{{groups.webservices[0]}}"
+    volumes:
+    - "{{harvester.model_path}}{{harvester.name}}:/opt/bert.model"

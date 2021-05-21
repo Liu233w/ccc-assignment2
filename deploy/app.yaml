@@ -63,3 +63,19 @@
   roles:
   - name: setup-backend
     tags: ['app']
+
+- name: Setup harvester
+  hosts:
+  - db_head
+  - db_workers
+
+  vars_files:
+  - host_vars/app.yaml
+
+  gather_facts: true
+  remote_user: ec2-user
+  become: true
+
+  roles:
+  - name: setup-harvester
+    tags: ['harvester']
