@@ -10,11 +10,11 @@
 
 - name: Check that the model file exists
   stat:
-    path: "{{harvester.model_path}}{{harvester.name}}"
+    path: "{{harvester.model_path}}{{harvester.model_name}}"
   register: stat_result
 
 - name: Download model
-  shell: "gdown '{{harvester.model_url}}' -O '{{harvester.model_path}}{{harvester.name}}'"
+  shell: "gdown '{{harvester.model_url}}' -O '{{harvester.model_path}}{{harvester.model_name}}'"
   when: not stat_result.stat.exists
 
 - name: Deploy harvester
