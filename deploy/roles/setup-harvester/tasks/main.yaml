@@ -14,7 +14,7 @@
   register: stat_result
 
 - name: Download model
-  shell: "gdown '{{harvester.model_url}}' -O '{{harvester.model_path}}{{harvester.model_name}}'"
+  shell: "python3 -m gdown.cli '{{harvester.model_url}}' -O '{{harvester.model_path}}{{harvester.model_name}}'"
   when: not stat_result.stat.exists
 
 - name: Deploy harvester
@@ -25,10 +25,11 @@
     state: started
     # recreate: yes
     restart_policy: unless-stopped
+    network_mode: host
     env:
       COUCHDB_HOST: "{{groups.db_head[0]}}"
       COUCHDB_USER: '{{couchdb.user}}'
       COUCHDB_PASSWORD: '{{couchdb.pwd}}'
       REDIS_HOST: "{{groups.webservices[0]}}"
     volumes:
-    - "{{harvester.model_path}}{{harvester.name}}:/opt/bert.model"
+    - "{{harvester.model_path}}{{harvester.model_name}}:/opt/bert.model"
