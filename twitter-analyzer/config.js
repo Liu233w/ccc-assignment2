@@ -1,3 +1,3 @@
 module.exports = {
-  backendUrl: process.env.backendUrl || 'http://localhost:9797',
+  backendUrl: process.env.BACKEND_URL || 'http://localhost:9797',
 }

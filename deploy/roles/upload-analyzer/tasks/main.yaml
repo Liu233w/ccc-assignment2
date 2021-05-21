@@ -1,0 +1,10 @@
+---
+
+- name: Run analyzer uploader to upload view to couch db
+  docker_container:
+    name: analyzer_uploader
+    image: "{{analyzer.image}}"
+    state: started
+    # recreate: yes
+    env:
+      BACKEND_URL: "http://{{groups.webservices[0]}}"

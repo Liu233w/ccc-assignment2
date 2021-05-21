@@ -63,6 +63,8 @@
   roles:
   - name: setup-backend
     tags: ['app']
+  - name: upload-analyzer
+    tags: ['analyzer']
 
 - name: Setup harvester
   hosts:
