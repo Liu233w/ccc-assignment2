@@ -29,7 +29,7 @@
 
 - name: Add twitter database
   uri:
-    url: http://{{inventory_hostname}}:5984/twitter
+    url: http://{{inventory_hostname}}:5984/twitter?partitioned=true
     url_username: '{{couchdb.user}}'
     url_password: '{{couchdb.pwd}}'
     force_basic_auth: yes
