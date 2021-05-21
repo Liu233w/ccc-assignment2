@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
 
-    <v-app-bar
+    <!-- <v-app-bar
         app
         clipped-right
         flat
@@ -18,8 +18,8 @@
             solo-inverted
         ></v-text-field>
       </v-responsive>
-    </v-app-bar>
-
+    </v-app-bar> -->
+<!-- 
     <v-navigation-drawer
         v-model="drawer"
         app
@@ -86,7 +86,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
 
     <v-main>
       <!--        <router-view :key="this.$route.path" />-->
@@ -94,7 +94,7 @@
 
     </v-main>
 
-    <v-footer
+    <!-- <v-footer
         app
         color="transparent"
         height="72"
@@ -108,7 +108,7 @@
           rounded
           solo
       ></v-text-field>
-    </v-footer>
+    </v-footer> -->
   </v-app>
 </template>
 
