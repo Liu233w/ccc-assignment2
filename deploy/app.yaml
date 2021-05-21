@@ -68,7 +68,7 @@
 
 - name: Setup harvester
   hosts:
-  - db_head
+  # - db_head
   - db_workers
 
   vars_files:
