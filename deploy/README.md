@@ -15,3 +15,18 @@ Ansible playbook to deploy the project
 - Run `ansible-playbook --private-key=~/.ssh/mrc.pem -i=hosts.ini app.yaml` to deploy db and application
   - You may need to change `~/.ssh/mrc.pem` to the location to your private key
   - In WSL2, you may need to set the permission of the pem file: `chmod 600 ~/.ssh/mrc.pem`
+
+# Only deploy part of the project
+This can be useful when only part of the project need to be updated.
+
+You can add switch `--tags ...` or `--without-tags ...` into command `ansible-playbook --private-key=~/.ssh/mrc.pem -i=hosts.ini app.yaml`.
+
+The tags are listed below:
+
+| tag | comment |
+| --- | ------- |
+| couchdb | deploy couchdb |
+| redis | |
+| app | the backend and frontend |
+| harvester | twitter harvester |
+| analyzer | twitter analyzer |
