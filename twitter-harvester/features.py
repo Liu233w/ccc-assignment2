@@ -18,25 +18,27 @@ def load_features(filepath, couchdb: CouchDB):
 
     features = []
     for feature in poly_features:
+        if feature["geometry"] is None:
+            continue
         coords = feature["geometry"]["coordinates"]
         box = [None, None, None, None]
 
         for x in coords:
             for y in x:
-                for z in y:
-                    if box[0] is None or z[0] < box[0]:
-                        box[0] = z[0]
-                    if box[1] is None or z[1] < box[1]:
-                        box[1] = z[1]
-                    if box[2] is None or z[0] > box[2]:
-                        box[2] = z[0]
-                    if box[3] is None or z[1] > box[3]:
-                        box[3] = z[1]
+                if box[0] is None or y[0] < box[0]:
+                    box[0] = y[0]
+                if box[1] is None or y[1] < box[1]:
+                    box[1] = y[1]
+                if box[2] is None or y[0] > box[2]:
+                    box[2] = y[0]
+                if box[3] is None or y[1] > box[3]:
+                    box[3] = y[1]
 
         id = sha1(json.dumps(box).encode('utf8')).digest().hex()
         features.append({
             "id": id,
             "name": feature["properties"]["name"],
+            "loc_pid": feature["properties"]["loc_pid"],
             "box": box
         })
 
@@ -54,6 +56,7 @@ def load_features(filepath, couchdb: CouchDB):
         "_id": feature["id"],
         "box": feature["box"],
         "name": feature["name"],
+        "loc_pid": feature["loc_pid"],
         "newest": None,
         "oldest": None
     }, new_features))

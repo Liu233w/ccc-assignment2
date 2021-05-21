@@ -87,7 +87,7 @@ def update_location_info(feature, start_time: datetime, end_time: datetime, back
     doc.save()
 
 
-def format_response(response):
+def format_response(response, feature):
     places = {}
     users = {}
     tweets = response["data"]
@@ -103,6 +103,11 @@ def format_response(response):
         partition_key = datetime.fromisoformat(tweet["created_at"][:-1]).strftime("%Y%m")
         id = tweet["id"]
         tweet["_id"] = "%s:%s" % (partition_key, id)
+        tweet["feature"] = {
+            "_id": feature["_id"],
+            "name": feature["name"],
+            "loc_pid": feature["loc_pid"]
+        }
         try:
             if "author_id" in tweet:
                 tweet["author"] = users[tweet["author_id"]]
@@ -151,7 +156,7 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
         if "data" not in response or len(response["data"]) == 0:
             break
 
-        tweets = format_response(response)
+        tweets = format_response(response, feature)
 
         # Add category prediction
         pt1 = time()
