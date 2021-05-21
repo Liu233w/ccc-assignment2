@@ -16,7 +16,7 @@ os.environ["MAP_PATH"] = "/Users/robertsloan/repos/ccc-assignment2/flaskapp/fron
 os.environ["MODEL_PATH"] = "/Users/robertsloan/Desktop/BERT_classification_epoch_1.model"
 
 
-def create_params(feature, next_token, backfill=False):
+def create_params(feature, next_token, start_time, end_time):
 
     # Combine boxes of max 25 miles
     box = feature["box"]
@@ -42,22 +42,6 @@ def create_params(feature, next_token, backfill=False):
             map(lambda point: "%.6f" % point, box)
         ), boxes))
 
-    # Get the start and end times
-    start_time = None
-    end_time = None
-    if (backfill):
-        start_time = datetime.fromtimestamp(feature["latest"])
-        end_time = start_time + timedelta(days=30)
-    else:
-        end_time = datetime.fromtimestamp(feature["oldest"])
-        start_time = end_time - timedelta(days=30)
-
-    # Keep times within Twitter limits
-    if end_time > datetime.utcnow() - timedelta(seconds=30):
-        end_time = datetime.utcnow() - timedelta(seconds=30)
-    if start_time < datetime(2017, 1, 1):
-        start_time = datetime(2017, 1, 1)
-
     params = {
         "start_time": start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
         "end_time": end_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -74,6 +58,34 @@ def create_params(feature, next_token, backfill=False):
         params["next_token"] = next_token
 
     return params
+
+
+def get_time_interval(feature, backfill) -> "tuple[datetime, datetime]":
+    # Get the start and end times
+    start_time = None
+    end_time = None
+    if not backfill:
+        start_time = datetime.fromtimestamp(feature["newest"])
+        end_time = datetime.utcnow() - timedelta(seconds=30)
+    else:
+        end_time = datetime.fromtimestamp(feature["oldest"])
+        start_time = end_time - timedelta(days=30)
+
+    # Keep times within Twitter limits
+    if start_time < datetime(2017, 1, 1):
+        start_time = datetime(2017, 1, 1)
+
+    return start_time, end_time
+
+
+def update_location_info(feature, start_time: datetime, end_time: datetime, backfill: bool, couchdb: CouchDB):
+    doc = couchdb["features"][feature["_id"]]
+    if not backfill:
+        doc["newest"] = int(end_time.timestamp())
+    else:
+        doc["oldest"] = int(start_time.timestamp())
+
+    doc.save()
 
 
 def format_response(response):
@@ -105,10 +117,16 @@ def format_response(response):
 
 def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
     response = {"meta": {"next_token": None}}
+    start_time, end_time = get_time_interval(feature, backfill)
+
     page = 0
     while "next_token" in response["meta"] and page < 10:
         next_token = response["meta"]["next_token"]
-        print('Getting tweets for %s%s' % (feature["name"], ", next_token: %s..." % next_token))
+        print('Getting tweets for %s between %s and %s%s' % (
+            feature["name"],
+            start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            end_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            ", next_token: %s..." % next_token))
         page += 1
 
         # Get tweets from Twitter
@@ -116,7 +134,7 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
         try:
             response = api.get(
                 endpoint='2/tweets/search/all',
-                params=create_params(feature, next_token, backfill),
+                params=create_params(feature, next_token, start_time, end_time),
                 couchdb=couchdb,
                 redis=redis)
         except Exception as e:
@@ -124,13 +142,15 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
             sleep(1)
             continue
         gt2 = time()
-        print("%.2fs to get %s tweets in %s" % (
+        print("%.2fs to get %s tweets from %s" % (
             gt2 - gt1,
             len(response["data"]) if "data" in response else 0,
             feature["name"]))
 
+        update_location_info(feature, start_time, end_time, backfill, couchdb)
+
         if "data" not in response or len(response["data"]) == 0:
-            continue
+            break
 
         tweets = format_response(response)
 
@@ -178,23 +198,46 @@ def main():
     print("Loading Time: %.2fs" % (time() - start_time))
 
     while True:
-        feature = couchdb["features"].get_query_result(
-            selector={"_id": {"$gt": None}},
+        result = couchdb["features"].get_query_result(
+            selector={
+                "newest": {
+                    "$or": [
+                        {"$exists": False},
+                        {"$lt": int((datetime.utcnow() - timedelta(hours=1)).timestamp())}
+                    ]
+                }
+            },
             sort=[{"newest": "asc"}],
             limit=1
-        ).all()[0]
-        print("Calling for feature: %s..." % feature["_id"])
-        call_for_feature(feature, model, tokenizer,
-                         couchdb, redis, backfill=False)
+        ).all()
+        if len(result) == 0:
+            print('No outdated features...')
+            sleep(60)
+        else:
+            feature = result[0]
+            print("Calling for feature: %s..." % feature["_id"])
+            call_for_feature(feature, model, tokenizer,
+                             couchdb, redis, backfill=False)
 
-        feature_backfill = couchdb["features"].get_query_result(
-            selector={"_id": {"$gt": None}},
+        result = couchdb["features"].get_query_result(
+            selector={
+                "oldest": {
+                    "$or": [
+                        {"$exists": False},
+                        {"$gt": datetime(2017, 1, 1).timestamp()}
+                    ]
+                }
+            },
             sort=[{"oldest": "desc"}],
             limit=1
-        ).all()[0]
-        print("Calling backfill for feature: %s..." % feature["_id"])
-        call_for_feature(feature_backfill, model, tokenizer,
-                         couchdb, redis, backfill=True)
+        ).all()
+        if len(result) == 0:
+            print('No missing backfill...')
+        else:
+            feature = result[0]
+            print("Calling backfill for feature: %s..." % feature["_id"])
+            call_for_feature(feature, model, tokenizer,
+                             couchdb, redis, backfill=False)
 
 
 if __name__ == "__main__":
