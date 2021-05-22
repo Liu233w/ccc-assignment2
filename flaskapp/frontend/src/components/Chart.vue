@@ -46,7 +46,7 @@ export default {
         tooltip: {
           trigger: 'item',
           formatter: (data) => {
-            return data.name + ': ' + data.percent + '%'
+            return data.name + ': ' + data.value.value
           }
         },
         // legend: {
@@ -67,7 +67,7 @@ export default {
             radius: "55%",
             center: ["50%", "50%"],
             label: {
-              formatter: '{@name}: {@value} ({d}%)'
+              formatter: '{@name}: {d}%'
             },
             encode: {
               value: 0,
@@ -93,7 +93,6 @@ export default {
       this.option.title.text = value
       
       const suburb = this.$store.getters['categories/suburb'][value.toUpperCase()]
-      console.log('suburb', value, suburb)
       if (!suburb || suburb.length <= 0) {
         return
       }
