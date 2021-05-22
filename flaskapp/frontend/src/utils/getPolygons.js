@@ -35,7 +35,7 @@
 import data from '../assets/jsonfile/polygons.json'
 data.features = data.features.filter(f => f.geometry)
 
-export async function getPolygonsByNames(names) {
+export function getPolygonsByNames(names) {
 
     const names_lowercase = names.map(item => item.toLowerCase())
     let regions = []
