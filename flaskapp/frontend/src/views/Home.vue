@@ -1,42 +1,43 @@
 <template>
   <div class="home">
-    <v-container fluid class="px-2">
-      <div id="nav">
-        <!-- <router-link to="/">Home</router-link> -->
-        <h1>Connected: {{ getConnectionStatus }}</h1>
-      </div>
-      <v-row dense>
-        <v-col cols="12" md="6">
-          <h1>{{ getCourse }}</h1>
-          <h2>{{ getTitle }}</h2>
-          <p>{{ getMembers }}</p>
-          <p>{{ getDescription }}</p>
-          <!-- <v-btn @click="postRequestToBackendHandler()">
-            Post To Backend
-          </v-btn>
-          <p>Post Request Response: {{ postRequestResponse }}</p> -->
-        </v-col>
-        <!-- <v-col>
-          <v-btn @click="getRequestToBackendHandler()">
-            Get Request from Backend
-          </v-btn>
-          <p>Get Request Response: {{ getRequestResponse }}</p>
-        </v-col> -->
-      </v-row>
-      <v-btn
-          rounded
-          color="primary"
-          dark
-          @click="$router.push('/demo')"
+  <v-parallax
+    dark
+    src="../assets/background.png"
+  >
+    <v-row
+      align="center"
+      justify="center"
+    >
+      <v-col
+        class="text-center"
+        cols="12"
       >
-        Enter Demo
-      </v-btn>
-    </v-container>
+        <h1 class="display-1 font-weight-bold mb-4">
+          [COMP90024] Cluster and Cloud Computing
+        </h1>
+        <h1 class="subheading">
+          Assignment 2 Project App
+        </h1>
+        <h2 class="subheading">
+          Team 2 Members
+        </h2>
+        <h4 class="subheading">
+          Shumin Liu, Ying Mao, Jason Lau, Keshawa Jay, Rob Sloan
+        </h4>
+      </v-col>
+    </v-row>
+  </v-parallax>
+  <v-row justify="center">
+    <v-col cols="6" align-self="center">
+      <h1 class="text-center">Project Description</h1>
+      <p></p>
+    </v-col>
+  </v-row>
   </div>
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 const axios = require("axios").default;
 
@@ -47,14 +48,13 @@ export default {
 
   data: () => ({
     postRequestResponse: "",
-    getRequestResponse: ""
+    getRequestResponse: "",
   }),
-
 
   computed: {
     ...mapGetters("msgParserSocketStore", [
       "getUrlAddress",
-      "getConnectionStatus"
+      "getConnectionStatus",
     ]),
     ...mapGetters("homePanelStore", [
       "getCourse",
@@ -75,21 +75,21 @@ export default {
       this.postRequestResponse = "";
       // urlAddress: 'http://localhost:9797/api/services/post-example'
       const urlAddress = `${this.getUrlAddress}/api/services/post-example`;
-      const payload = {request: "post request from frontend"};
+      const payload = { request: "post request from frontend" };
       return axios
-          .post(urlAddress, payload)
-          .then(function (resp) {
-            // resp: data,[object Object],status,200,statusText,OK,headers,[object Object],config,[object Object],request,[object XMLHttpRequest]
-            // data returned from backend is contained in: resp.data
-            // resp.data = {"response": "post request is successful"} <- response from backend
-            let result = resp.data.response;
-            console.log(`POST request result received: ${result}`);
-            return result;
-          })
-          .catch((err) => {
-            console.log(`${err}`);
-            return err;
-          });
+        .post(urlAddress, payload)
+        .then(function (resp) {
+          // resp: data,[object Object],status,200,statusText,OK,headers,[object Object],config,[object Object],request,[object XMLHttpRequest]
+          // data returned from backend is contained in: resp.data
+          // resp.data = {"response": "post request is successful"} <- response from backend
+          let result = resp.data.response;
+          console.log(`POST request result received: ${result}`);
+          return result;
+        })
+        .catch((err) => {
+          console.log(`${err}`);
+          return err;
+        });
     },
     postRequestToBackendHandler() {
       const returnResult = this.postRequestToBackend();
@@ -104,19 +104,19 @@ export default {
       const urlAddress = `${this.getUrlAddress}/api/services/get-example?id=1234`;
       // const payload = { id: 1234 };
       return axios
-          .get(urlAddress)
-          .then(function (resp) {
-            // resp: data,[object Object],status,200,statusText,OK,headers,[object Object],config,[object Object],request,[object XMLHttpRequest]
-            // data returned from backend is contained in: resp.data
-            // resp.data = {"response": "post request is successful"} <- response from backend
-            let result = resp.data.response;
-            console.log(`GET request result received: ${result}`);
-            return result;
-          })
-          .catch((err) => {
-            console.log(`${err}`);
-            return err;
-          });
+        .get(urlAddress)
+        .then(function (resp) {
+          // resp: data,[object Object],status,200,statusText,OK,headers,[object Object],config,[object Object],request,[object XMLHttpRequest]
+          // data returned from backend is contained in: resp.data
+          // resp.data = {"response": "post request is successful"} <- response from backend
+          let result = resp.data.response;
+          console.log(`GET request result received: ${result}`);
+          return result;
+        })
+        .catch((err) => {
+          console.log(`${err}`);
+          return err;
+        });
     },
     getRequestToBackendHandler() {
       const returnResult = this.getRequestToBackend();
@@ -124,8 +124,6 @@ export default {
         this.getRequestResponse = resp;
       });
     },
-
-
   },
 
   created() {
@@ -136,8 +134,6 @@ export default {
   activated() {
     this.testBackendEventEmitExample();
   },
-
-
 };
 </script>
 
@@ -146,6 +142,8 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url("/images/background.png");
+  background-size: cover;
   text-align: center;
   color: #2c3e50;
 }
