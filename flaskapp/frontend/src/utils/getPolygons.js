@@ -45,7 +45,6 @@ export function getPolygonsByNames(names) {
         // TODO: names may be illegal
         if (region === undefined) {
             // do something...
-            console.log("Region name is not correct", value)
             return
         }
 

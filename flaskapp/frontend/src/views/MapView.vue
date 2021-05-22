@@ -146,7 +146,7 @@ export default {
     },
 
     queryLocation() {
-      // Todo: User Input Regularization. Default is splitting by ' '. But Box Hill...?
+      // Todo: User Input Regularization. Default is splitted by ','
       // names is an arrays
       if (!this.user_input) {
         this.regions = getAllPolygons();
@@ -154,9 +154,15 @@ export default {
       }
 
       this.infoWinOpen = false;
-      this.regions = [];
       const names = this.user_input.split(",");
-      this.regions = getPolygonsByNames(names);
+      const regions = getPolygonsByNames(names);
+      console.log(regions);
+      if (regions.length === 0) {
+        alert('Location is not found!')
+      }
+      else {
+        this.regions = regions
+      }
       this.polygon_options.visible = true;
     },
   },

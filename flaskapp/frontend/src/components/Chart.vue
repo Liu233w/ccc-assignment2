@@ -5,6 +5,7 @@
 
 <script>
 import {THEME_KEY} from "vue-echarts";
+import getColorByTopic from "@/utils/getTopicColors";
 
 export default {
   name: "Chart",
@@ -66,6 +67,7 @@ export default {
             type: "pie",
             radius: "55%",
             center: ["50%", "50%"],
+            color: [],
             label: {
               formatter: '{@name}: {d}%'
             },
@@ -88,25 +90,40 @@ export default {
 
   watch: {
     rename(value) {
+
+      this.clearColorPalette()
+
       this.loaded = false
 
       this.option.title.text = value
-      
+
       const suburb = this.$store.getters['categories/suburb'][value.toUpperCase()]
       if (!suburb || suburb.length <= 0) {
         return
       }
-
+      console.log(suburb)
       const res = []
       for (const category in suburb) {
         if (category === 'OTHER') {
           continue
         }
         const value = suburb[category]
+        console.log(category)
+        console.log(value)
         res.push({value, name: category})
+        this.option.series[0]['color'].push(getColorByTopic(category))
       }
+      // if suburb is {OTHER:...} then return nothing...
+      if (res.length === 0) return;
+
       this.$set(this.option.dataset, 'source', res)
       this.loaded = true
+    }
+  },
+
+  methods: {
+    clearColorPalette() {
+      this.option.series[0]['color'] = []
     }
   }
 }
