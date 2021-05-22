@@ -67,12 +67,8 @@ export default {
             radius: "55%",
             center: ["50%", "50%"],
             label: {
-              show: false,
-              position: 'center'
+              formatter: '{@name}: {@value} ({d}%)'
             },
-            // label: {
-            //   formatter: '{@name}: {@value} ({d}%)'
-            // },
             encode: {
               value: 0,
               itemName: 1, //'name'

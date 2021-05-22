@@ -9,7 +9,7 @@
           <h1 class="subheading">Assignment 2 Project App</h1>
           <h2 class="subheading">Team 2 Members</h2>
           <h4 class="subheading">
-            Shumin Liu, Ying Mao, Jason Lau, Keshawa Jay, Rob Sloan
+            Shumin Liu, Ying Mao, Jiexin Liu, Keshawa Jay, Rob Sloan
           </h4>
         </v-col>
       </v-row>
