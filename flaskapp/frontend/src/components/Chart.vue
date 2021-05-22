@@ -46,7 +46,7 @@ export default {
         tooltip: {
           trigger: 'item',
           formatter: (data) => {
-            return data.name + ': ' + data.value.value
+            return data.name + ': ' + data.percent + '%'
           }
         },
         // legend: {
@@ -104,6 +104,9 @@ export default {
 
       const res = []
       for (const category in suburb) {
+        if (category === 'OTHER') {
+          continue
+        }
         const value = suburb[category]
         res.push({value, name: category})
       }
