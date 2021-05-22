@@ -68,8 +68,8 @@
 
 - name: Setup harvester
   hosts:
-  # - db_head
-  - db_workers
+  - db_head
+  # - db_workers
 
   vars_files:
   - host_vars/app.yaml
