@@ -5,6 +5,7 @@ from collections import namedtuple
 from redis import Redis
 from datetime import datetime, timedelta
 from time import sleep
+from random import random
 
 TwitterUrl = namedtuple(
     typename='TwitterUrl',
@@ -12,57 +13,72 @@ TwitterUrl = namedtuple(
     defaults=['https', 'api.twitter.com', '', '', '', ''])
 
 
-# TODO: avoid record deadlocks
 def auth(couchdb: CouchDB, redis: Redis, endpoint: str):
     # Select valid token
     now = datetime.utcnow().timestamp()
     min_window = (datetime.utcnow() - timedelta(minutes=15)).timestamp()
-    token = None
 
-    while not token:
-        result = couchdb["tokens"].get_query_result(
-            selector={
-                # ensure less than x calls per window
-                endpoint: {
-                    "$or": [
-                        {"$exists": False},
-                        {"total": {"$lt": 300}},
-                        {"since": {"$lt": min_window}}
-                    ]
+    complete = False
+    while not complete:
+        token = None
+        while not token:
+            result = couchdb["tokens"].get_query_result(
+                selector={
+                    # ensure less than x calls per window
+                    endpoint: {
+                        "$or": [
+                            {"$exists": False},
+                            {"total": {"$lt": 300}},
+                            {"since": {"$lt": min_window}}
+                        ]
+                    },
+                    # ensure less than one second per call
+                    "last_used": {
+                        "$or": [
+                            {"$exists": False},
+                            {"$lt": now - 2}
+                        ]
+                    }
                 },
-                # ensure less than one second per call
-                "last_used": {
-                    "$or": [
-                        {"$exists": False},
-                        {"$lt": now - 1}
-                    ]
+                sort=[{"last_used": "asc"}],
+                limit=1).all()
+            if len(result) == 0:
+                print("No valid token, waiting...")
+                sleep(1)
+                continue
+            else:
+                token = result[0]
+
+        doc = couchdb["tokens"][token["_id"]]
+        doc.fetch()
+
+        # Update last_used
+        needs_new_window = endpoint not in doc or doc[endpoint]["since"] < min_window
+        if needs_new_window:
+            doc.update({
+                "last_used": now,
+                endpoint: {
+                    "since": now,
+                    "total": 1
                 }
-            },
-            limit=1).all()
-        if len(result) == 0:
-            print("No valid token, waiting...")
-            sleep(1)
-            continue
+            })
         else:
-            token = result[0]
-    print("Using token: %s" % token["_id"])
-    doc = couchdb["tokens"][token["_id"]]
+            doc.update({
+                "last_used": now,
+                endpoint: {
+                    **doc[endpoint],
+                    "total": doc[endpoint]["total"] + 1
+                }
+            })
 
-    # Update last_used
-    doc["last_used"] = now
-
-    # Update window details
-    if endpoint not in doc or doc[endpoint]["since"] < min_window:
-        # Create window if non-existant or outdated
-        doc[endpoint] = {
-            "since": datetime.utcnow().timestamp(),
-            "total": 1
-        }
-    else:
-        # Update otherwise
-        doc[endpoint]["total"] += 1
-
-    doc.save()
+        try:
+            doc.save()
+            print("Using token: %s" % token["_id"])
+            complete = True
+        except Exception as e:
+            print("CouchDB Token Error", e)
+            sleep(random() * 0.3 + 0.1)
+            continue
 
     return token["token"]
 

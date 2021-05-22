@@ -237,6 +237,7 @@ def main():
             feature["_id"]))
         call_for_feature(feature, model, tokenizer,
                          couchdb, redis, backfill)
+        print()
 
 
 if __name__ == "__main__":
