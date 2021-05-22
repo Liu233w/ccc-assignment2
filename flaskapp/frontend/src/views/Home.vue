@@ -30,7 +30,16 @@
   <v-row justify="center">
     <v-col cols="6" align-self="center">
       <h1 class="text-center">Project Description</h1>
-      <p></p>
+      <v-divider></v-divider>
+      <p class="mt-10">
+        This application aims to show what types of products people are interested in different
+        regions in Greate Melbourne Area and how this is related to people's occupations. The analysis
+        regarding people's interests in different products is conducted based on twitter data harvested. 
+        Product range includes Sport, IT, Cooking and Food, Education, Pet, etc. Occupation by age in 
+        different regions is retrieved from AURIN, which gets mapped to people's interests to demonstrate the trend.<br>
+        Demo panel allows user to interact with the data via selecting regions in goolge map.
+        Patterns and trend will be displayed accordingly in the format of charts or lists.
+      </p>
     </v-col>
   </v-row>
   </div>
