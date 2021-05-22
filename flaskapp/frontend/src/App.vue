@@ -11,7 +11,8 @@
       </v-toolbar-title>
       <div class="justify-end">
         <v-btn color="success" class="ma-2 white--text" @click="$router.push('/')">Home</v-btn>
-        <v-btn color="success" class="ma-2 white--text" @click="$router.push('/demo')">Demo</v-btn>
+        <v-btn color="success" class="ma-2 white--text" @click="$router.push('/demo')">Analysis</v-btn>
+        <v-btn color="success" class="ma-2 white--text" @click="$router.push('/graph')">Findings</v-btn>
       </div>
     </v-app-bar>
 
