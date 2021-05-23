@@ -3,7 +3,7 @@
     <v-parallax dark src="../assets/city.png">
       <v-row align="center" justify="center">
         <v-col class="text-center" cols="12">
-          <h1 class="display-1 font-weight-bold mb-4">Stastical Analysis</h1>
+          <h1 class="display-1 font-weight-bold mb-4">Findings</h1>
           <h2>
             As we targeted on analysing the relationship between the topics
             people are interested and their geometric locations in Great Melbourne
