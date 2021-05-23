@@ -19,19 +19,13 @@
         <h1 class="text-center">Project Description</h1>
         <v-divider></v-divider>
         <p class="mt-10">
-          This application aims to show what types of products people are
-          interested in different regions in Greate Melbourne Area and how this
-          is related to people's occupations. The analysis regarding people's
-          interests in different products is conducted based on twitter data
-          harvested. Product range includes Sport, IT, Cooking and Food,
-          Education, Pet, etc. Occupation by age in different regions is
-          retrieved from AURIN, which gets mapped to people's interests to
-          demonstrate the trend.<br />
-          Analysis panel allows user to interact with the data via selecting regions
-          in goolge map and results will be displayed accordingly.<br />
-          Findings panel displays a sample result in the format of histogram to demonstrate
-          how people's interests in different products is related to their occupation in 
-          different regions.
+          This application analyzed what kind of topics people are interested in different regions of Great Melbourne Area.
+          Twitter data are harvested and categorized into 10 categories, which are entertainment, business, technology, gaming, music, sports, 
+          politics, fashion, health and food.<br /><br />
+          Analysis panel allows user to interact with the live data via selecting the region
+          in goolge map to obtain the result of that region. Result is displayed in the format of pie charts, which shows 
+          the number of tweets that is relevant to a particular topic in percentage.<br /><br />
+          Findings panel displays the results collected from five suburbs to demonstrate our findings in more details.
         </p>
       </v-col>
     </v-row>

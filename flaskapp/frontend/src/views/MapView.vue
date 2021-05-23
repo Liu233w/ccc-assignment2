@@ -2,13 +2,17 @@
   <v-container>
     <v-row>
       <v-col cols="12">
+        <v-alert border="right" color="teal darken-3" dark>
+          Please select a region and click on it to visualize the result.
+        </v-alert>
+      </v-col>
+      <v-col cols="12">
         <GmapMap
           :options="mapConfig"
           :center="center"
           class="google-map"
           ref="mapRef"
         >
-
           <template #visible>
             <v-container>
               <v-row>
@@ -36,7 +40,7 @@
             :options="infoOptions"
             :position="infoWindowPos"
             :opened="infoWinOpen"
-            @closeclick="infoWinOpen=false"
+            @closeclick="infoWinOpen = false"
             class="info-window"
           >
             <p v-if="loading">Loading...</p>
@@ -47,7 +51,7 @@
             v-for="(r, i) in regions"
             :key="i"
             :paths="r.path"
-            :options="{...polygon_options, ...extra_options[r.name]}"
+            :options="{ ...polygon_options, ...extra_options[r.name] }"
             @mouseover="togglePolygon(r, true)"
             @mouseout="togglePolygon(r, false)"
             @click="toggleInfoWindow(r)"
@@ -158,10 +162,9 @@ export default {
       const regions = getPolygonsByNames(names);
       console.log(regions);
       if (regions.length === 0) {
-        alert('Location is not found!')
-      }
-      else {
-        this.regions = regions
+        alert("Location is not found! Please refresh the page!");
+      } else {
+        this.regions = regions;
       }
       this.polygon_options.visible = true;
     },
@@ -171,7 +174,7 @@ export default {
     this.regions = getAllPolygons();
     // console.log(getAllPolygons())
     await this.$store.dispatch("categories/refresh");
-    this.loading = false
+    this.loading = false;
   },
 
   mounted() {
