@@ -1,0 +1,13 @@
+---
+
+- name: Setup watchtower to automatically update docker image
+  docker_container:
+    name: watchtower
+    image: containrrr/watchtower
+    state: started
+    # recreate: yes
+    restart_policy: unless-stopped
+    env:
+      WATCHTOWER_POLL_INTERVAL: '1800' # every 30 minutes = 30 * 60
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

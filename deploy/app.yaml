@@ -14,8 +14,12 @@
   become: true
 
   roles:
-  - common
-  - setup-docker
+  - name: common
+    tags: ['common']
+  - name: setup-docker
+    tags: ['common', 'docker']
+  - name: setup-watchtower
+    tags: ['common', 'watchtower']
 
 - name: Setup couchDB
   hosts:
