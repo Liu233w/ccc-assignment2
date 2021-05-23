@@ -101,15 +101,13 @@ export default {
       if (!suburb || suburb.length <= 0) {
         return
       }
-      console.log(suburb)
+
       const res = []
       for (const category in suburb) {
         if (category === 'OTHER') {
           continue
         }
         const value = suburb[category]
-        console.log(category)
-        console.log(value)
         res.push({value, name: category})
         this.option.series[0]['color'].push(getColorByTopic(category))
       }
