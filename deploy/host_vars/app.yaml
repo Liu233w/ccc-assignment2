@@ -12,9 +12,6 @@ harvester:
   model_path: /var/harvester/
   model_name: bert.model
   model_url: https://drive.google.com/uc?export=download&id=1H4L2LYaajnfc--r1NK7gtm9jLLynpaKk
-  # barer tokens for twitter project (must be academic projects)
-  tokens:
-  - AAAAAAAAAAAAAAAAAAAAAGJfPwEAAAAAEvrglKdLUXoETxlnO%2B1NZmW3hEI%3Dgt5EaSjGLQWEQN0gdyV9qeJJgDpn30LfcGjugNyWF9IQyQQBB7
 
 analyzer:
   image: liu233w/ccc-assignment2-analyser-uploader
