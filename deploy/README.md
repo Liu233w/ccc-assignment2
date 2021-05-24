@@ -1,7 +1,7 @@
 Ansible playbook to deploy the project
 ===================================
 
-# To Start
+# To create open-stack instances
 - Install python and pip in your computer
 - Install ansible in your local computer by `sudo apt install ansible`
 - Install ansible dependencies by `ansible-galaxy install -r requirements.yml`
