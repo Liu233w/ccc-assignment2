@@ -1,9 +1,9 @@
 ccc-assignment2
------------------------
+===============================
 
 The project 2 of COMP90024 (Cluster and Cloud Computing) of the University of Melbourne.
 
-# Developers
+## Developers
 
 The members of Group 2:
 
@@ -13,12 +13,14 @@ The members of Group 2:
 - Jiexin Liu (1044804)
 - Robert Sloan (1142998)
 
-# Demo urls:
+License: [MIT](./LICENSE)
+
+## Demo urls:
 
 - Website: http://172.26.134.58/
 - Video demo: https://www.youtube.com/watch?v=vHLvIn_jtGA
 
-# Folder structures
+## Folder structures
 
 - deploy :: The Ansible script to create openstack instances and deploy the project
 - flaskapp :: The frontend and backend
