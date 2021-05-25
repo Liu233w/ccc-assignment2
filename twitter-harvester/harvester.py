@@ -7,6 +7,14 @@ import math
 import api
 from features import load_features
 from predictor import Predictor, load_model
+from random import random
+
+os.environ["COUCHDB_USERNAME"] = "admin"
+os.environ["COUCHDB_PASSWORD"] = "uJNh4NwrEt59o7"
+os.environ["COUCHDB_HOST"] = "172.26.129.48"
+os.environ["REDIS_HOST"] = "172.26.134.58"
+os.environ["MAP_PATH"] = "/Users/robertsloan/repos/ccc-assignment2/flaskapp/frontend/src/assets/jsonfile/polygons.json"
+os.environ["MODEL_PATH"] = "/Users/robertsloan/Desktop/BERT_classification_epoch_1.model"
 
 
 def create_params(feature, next_token, start_time, end_time):
@@ -44,7 +52,7 @@ def create_params(feature, next_token, start_time, end_time):
         "tweet.fields": "author_id,created_at,geo,id,source,text",
         "place.fields": "full_name,geo,place_type",
         "user.fields": "location,username",
-        "max_results": 300,
+        "max_results": 500,
     }
 
     if next_token:
@@ -78,13 +86,17 @@ def get_time_interval(feature, backfill) -> "tuple[datetime, datetime]":
 
 
 def update_location_info(feature, start_time: datetime, end_time: datetime, backfill: bool, couchdb: CouchDB):
-    doc = couchdb["features"][feature["_id"]]
-    if not backfill:
-        doc["newest"] = int(end_time.timestamp())
-    else:
-        doc["oldest"] = int(start_time.timestamp())
+    try:
+        couchdb.connect()
+        doc = couchdb["features"][feature["_id"]]
+        if not backfill:
+            doc["newest"] = int(end_time.timestamp())
+        else:
+            doc["oldest"] = int(start_time.timestamp())
 
-    doc.save()
+        doc.save()
+    finally:
+        couchdb.disconnect()
 
 
 def format_response(response, feature):
@@ -119,7 +131,7 @@ def format_response(response, feature):
     return tweets
 
 
-def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
+def call_for_feature(feature, model, tokenizer, couchdb: CouchDB, redis, backfill=False):
     response = {"meta": {"next_token": None}}
     start_time, end_time = get_time_interval(feature, backfill)
 
@@ -135,16 +147,11 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
 
         # Get tweets from Twitter
         gt1 = time()
-        try:
-            response = api.get(
-                endpoint="2/tweets/search/all",
-                params=create_params(feature, next_token, start_time, end_time),
-                couchdb=couchdb,
-                redis=redis)
-        except Exception as e:
-            print(e)
-            sleep(1)
-            break
+        response = api.get(
+            endpoint="2/tweets/search/all",
+            params=create_params(feature, next_token, start_time, end_time),
+            couchdb=couchdb,
+            redis=redis)
         gt2 = time()
         print("%.2fs to get %s tweets from %s" % (
             gt2 - gt1,
@@ -170,7 +177,9 @@ def call_for_feature(feature, model, tokenizer, couchdb, redis, backfill=False):
 
         # Save to CouchDB
         t1 = time()
+        couchdb.connect()
         couchdb["twitter"].bulk_docs(tweets)
+        couchdb.disconnect()
         t2 = time()
         print("%.2fs to save" % (t2 - t1))
 
@@ -183,7 +192,7 @@ def main():
         user=os.environ["COUCHDB_USERNAME"],
         auth_token=os.environ["COUCHDB_PASSWORD"],
         url="http://%s:5984/" % os.environ["COUCHDB_HOST"],
-        connect=True,
+        connect=False,
         auto_renew=True)
     redis = Redis(os.environ["REDIS_HOST"], 6379, 0)
 
@@ -200,44 +209,77 @@ def main():
     print("Loading Time: %.2fs" % (time() - start_time))
 
     while True:
-        backfill = False
-        result = couchdb["features"].get_query_result(
-            selector={
-                "newest": {
-                    "$or": [
-                        {"$exists": False},
-                        {"$lt": int((datetime.utcnow() - timedelta(days=1)).timestamp())}
-                    ]
-                }
-            },
-            sort=[{"newest": "asc"}],
-            limit=1
-        ).all()
-        if len(result) == 0:
-            backfill = True
+        try:
+            # Select a location
+            backfill = False
+            couchdb.connect()
+
+            # Use most out of date location
             result = couchdb["features"].get_query_result(
-                selector={"oldest": {"$or": [{"$exists": False}, None]}},
+                selector={
+                    "newest": {
+                        "$or": [
+                            {"$exists": False},
+                            {"$lt": int((datetime.utcnow() - timedelta(days=1)).timestamp())}
+                        ]
+                    },
+                    "status": {"$or": [{"$exists": False}, {"$ne": "in_use"}]}
+                },
+                sort=[{"newest": "asc"}],
                 limit=1
             ).all()
             if len(result) == 0:
+                # Backfill historical data if all are in date
+                backfill = True
                 result = couchdb["features"].get_query_result(
-                    selector={"oldest": {"$gt": datetime(2006, 4, 1).timestamp()}},
-                    sort=[{"oldest": "desc"}],
+                    selector={
+                        "oldest": {"$or": [{"$exists": False}, None]},
+                        "status": {"$or": [{"$exists": False}, {"$ne": "in_use"}]}
+                    },
                     limit=1
                 ).all()
+                if len(result) == 0:
+                    result = couchdb["features"].get_query_result(
+                        selector={
+                            "oldest": {"$gt": datetime(2006, 4, 1).timestamp()},
+                            "status": {"$or": [{"$exists": False}, {"$ne": "in_use"}]}
+                        },
+                        sort=[{"oldest": "desc"}],
+                        limit=1
+                    ).all()
 
-        if len(result) == 0:
-            print("No jobs...")
-            sleep(3600)
-            continue
+            if len(result) == 0:
+                print("No jobs...")
+                couchdb.disconnect()
+                sleep(3600)
+                continue
 
-        feature = result[0]
-        print("Calling %sfor feature: %s..." % (
-            "backfill " if backfill else "",
-            feature["_id"]))
-        call_for_feature(feature, model, tokenizer,
-                         couchdb, redis, backfill)
-        print()
+            # Mark location as "in use"
+            doc = couchdb["features"][result[0]["_id"]]
+            doc["status"] = "in_use"
+            doc.save()
+
+            try:
+                # Process tweets at that location
+                feature = result[0]
+                print("Calling %sfor feature: %s..." % (
+                    "backfill " if backfill else "",
+                    feature["_id"]))
+                call_for_feature(feature, model, tokenizer,
+                                 couchdb, redis, backfill)
+                print()
+            finally:
+                # Mark location as "available"
+                couchdb.connect()
+                doc = couchdb["features"][result[0]["_id"]]
+                doc["status"] = "available"
+                doc.save()
+
+        except Exception as e:
+            print(e)
+            sleep(random() * 0.3 + 0.1)
+        finally:
+            couchdb.disconnect()
 
 
 if __name__ == "__main__":
