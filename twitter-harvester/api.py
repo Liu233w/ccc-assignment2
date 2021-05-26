@@ -38,7 +38,7 @@ def auth(couchdb: CouchDB, redis: Redis, endpoint: str):
                     "last_used": {
                         "$or": [
                             {"$exists": False},
-                            {"$lt": now - 1}
+                            {"$lt": now - 1.5}
                         ]
                     }
                 }
