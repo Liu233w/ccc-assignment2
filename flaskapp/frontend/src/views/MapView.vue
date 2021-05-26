@@ -175,6 +175,8 @@ export default {
     // console.log(getAllPolygons())
     await this.$store.dispatch("categories/refresh");
     this.loading = false;
+
+    this.$store.dispatch("categories/startAutoRefreshing")
   },
 
   mounted() {

@@ -1,19 +1,24 @@
 <template>
   <p v-if="!loaded">No data</p>
-  <v-chart v-else class="chart" :option="option"/>
+  <v-chart
+    v-else
+    class="chart"
+    :option="option"
+  />
 </template>
 
 <script>
-import {THEME_KEY} from "vue-echarts";
+import { THEME_KEY } from "vue-echarts";
 import getColorByTopic from "@/utils/getTopicColors";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Chart",
   provide: {
-    [THEME_KEY]: "shine" // dark, vintage, macarons, infographic, roma
+    [THEME_KEY]: "shine", // dark, vintage, macarons, infographic, roma
   },
 
-  props: ['rename'],
+  props: ["rename"],
 
   data() {
     return {
@@ -21,34 +26,34 @@ export default {
 
       option: {
         dataset: {
-          dimensions: ['value', 'name'],
+          dimensions: ["value", "name"],
           source: [
-            {value: 335, name: "Pets"},
-            {value: 310, name: "IT"},
-            {value: 234, name: "Cars"},
-            {value: 135, name: "Sports"},
-            {value: 1548, name: "Food"},
-            {value: 500, name: "Others"}
-          ]
+            { value: 335, name: "Pets" },
+            { value: 310, name: "IT" },
+            { value: 234, name: "Cars" },
+            { value: 135, name: "Sports" },
+            { value: 1548, name: "Food" },
+            { value: 500, name: "Others" },
+          ],
         },
 
         title: {
-          text: 'suburb',
-          left: 'center'
+          text: "suburb",
+          left: "center",
         },
 
         // tooltip: {},
 
         legend: {
-          bottom: 'bottom',
-          orient: "horizontal"
+          bottom: "bottom",
+          orient: "horizontal",
         },
 
         tooltip: {
-          trigger: 'item',
+          trigger: "item",
           formatter: (data) => {
-            return data.name + ': ' + data.value.value
-          }
+            return data.name + ": " + data.value.value;
+          },
         },
         // legend: {
         //   orient: "vertical",
@@ -69,7 +74,7 @@ export default {
             center: ["50%", "50%"],
             color: [],
             label: {
-              formatter: '{@name}: {d}%'
+              formatter: "{@name}: {d}%",
             },
             encode: {
               value: 0,
@@ -79,52 +84,64 @@ export default {
               itemStyle: {
                 shadowBlur: 10,
                 shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)"
-              }
-            }
-          }
-        ]
-      }
-    }
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+      },
+    };
+  },
+
+  computed: {
+    ...mapGetters("categories", ["suburb"]),
   },
 
   watch: {
-    rename(value) {
-
-      this.clearColorPalette()
-
-      this.loaded = false
-
-      this.option.title.text = value
-
-      const suburb = this.$store.getters['categories/suburb'][value.toUpperCase()]
-      if (!suburb || suburb.length <= 0) {
-        return
-      }
-
-      const res = []
-      for (const category in suburb) {
-        if (category === 'OTHER') {
-          continue
-        }
-        const value = suburb[category]
-        res.push({value, name: category})
-        this.option.series[0]['color'].push(getColorByTopic(category))
-      }
-      // if suburb is {OTHER:...} then return nothing...
-      if (res.length === 0) return;
-
-      this.$set(this.option.dataset, 'source', res)
-      this.loaded = true
-    }
+    rename() {
+      this.refreshData();
+    },
+    suburb() {
+      this.refreshData();
+    },
   },
 
   methods: {
     clearColorPalette() {
-      this.option.series[0]['color'] = []
-    }
-  }
-}
+      this.option.series[0]["color"] = [];
+    },
+    refreshData() {
+      this.clearColorPalette();
+
+      this.loaded = false;
+      if (!this.rename) {
+        return;
+      }
+
+      this.option.title.text = this.rename;
+
+      const suburb = this.suburb[this.rename.toUpperCase()];
+      if (!suburb || suburb.length <= 0) {
+        return;
+      }
+
+      const res = [];
+      for (const category in suburb) {
+        if (category === "OTHER") {
+          continue;
+        }
+        const value = suburb[category];
+        res.push({ value, name: category });
+        this.option.series[0]["color"].push(getColorByTopic(category));
+      }
+      // if suburb is {OTHER:...} then return nothing...
+      if (res.length === 0) return;
+
+      this.$set(this.option.dataset, "source", res);
+      this.loaded = true;
+    },
+  },
+};
 </script>
 
 <style scoped>
