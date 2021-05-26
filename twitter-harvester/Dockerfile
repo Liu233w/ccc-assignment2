@@ -2,7 +2,7 @@ FROM python:3.7-slim as final
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 
 COPY . .
 
