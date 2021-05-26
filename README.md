@@ -27,3 +27,5 @@ License: [MIT](./LICENSE)
 - tweet-textAnalyser :: The text classifier (used by twitter-harvester)
 - twitter-analyzer :: The Map-Reduce function for couch db and a script to upload the function
 - twitter-harvester :: The twitter harvester
+- report :: The LaTeX and PDF of the report
+
