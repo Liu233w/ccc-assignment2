@@ -9,13 +9,6 @@ from features import load_features
 from predictor import Predictor, load_model
 from random import random
 
-os.environ["COUCHDB_USERNAME"] = "admin"
-os.environ["COUCHDB_PASSWORD"] = "uJNh4NwrEt59o7"
-os.environ["COUCHDB_HOST"] = "172.26.129.48"
-os.environ["REDIS_HOST"] = "172.26.134.58"
-os.environ["MAP_PATH"] = "/Users/robertsloan/repos/ccc-assignment2/flaskapp/frontend/src/assets/jsonfile/polygons.json"
-os.environ["MODEL_PATH"] = "/Users/robertsloan/Desktop/BERT_classification_epoch_1.model"
-
 
 def create_params(feature, next_token, start_time, end_time):
 
