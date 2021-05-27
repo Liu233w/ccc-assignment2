@@ -44,16 +44,15 @@ def auth(couchdb: CouchDB, redis: Redis, endpoint: str):
                 }
 
                 result = couchdb["tokens"].get_query_result(
-                    selector=selector,
-                    sort=[{"last_used": "asc"}],
-                    limit=1).all()
+                    selector=selector
+                ).all()
                 if len(result) == 0:
                     print("No valid token, waiting...")
                     couchdb.disconnect()
                     sleep(random() * 0.5 + 0.5)
                     couchdb.connect()
                 else:
-                    token = result[0]
+                    token = result[int(random()*len(result))]
 
             doc = couchdb["tokens"][token["_id"]]
 
