@@ -44,7 +44,7 @@ Vue.component('v-chart', ECharts)
 
 Vue.use(GmapVue, {
   load: {
-    key: 'AIzaSyBObuayOsssm6Zkmi46aRDizkbdr1wJSGo',
+    key: 'AIzaSyD80YokVTEspwIFbtwyTSEn7V0xm1ypzGo',
   },
   installComponents: true
 })
